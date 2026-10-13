@@ -1,0 +1,313 @@
+{
+  "categories": [
+    {
+      "slug": "seo",
+      "name": "SEO",
+      "description": "Strategi optimasi mesin pencari organik, indexing, dan riset keyword",
+      "sortOrder": 1
+    },
+    {
+      "slug": "content-marketing",
+      "name": "Content Marketing",
+      "description": "Strategi pembuatan konten digital, pilar konten, dan repurpose artikel",
+      "sortOrder": 2
+    },
+    {
+      "slug": "social-media",
+      "name": "Social Media",
+      "description": "Optimasi media sosial Instagram, TikTok, jadwal posting dan engagement",
+      "sortOrder": 3
+    },
+    {
+      "slug": "visual-content",
+      "name": "Visual Content",
+      "description": "Foto produk AI, estetika feed brand, dan video promosi singkat",
+      "sortOrder": 4
+    }
+  ],
+  "people": [
+    {
+      "slug": "jonathan-anderson",
+      "name": "Jonathan Anderson T.",
+      "role": "SEO Lead & Editorial Reviewer",
+      "bio": "Jonathan Anderson adalah SEO Lead dan Editorial Reviewer di Optimark yang berfokus pada strategi SEO, content strategy, dan perkembangan AI-driven search. Ia memiliki pengalaman dalam mengembangkan strategi organic search, technical SEO, content marketing, serta optimasi konten untuk meningkatkan visibilitas dan relevansi website di mesin pencari.\n\nSebagai Editorial Reviewer, ia bertanggung jawab meninjau dan mengevaluasi konten Optimark sebelum dipublikasikan.",
+      "avatarUrl": "https://optimark.ai/images/blog/people/jonathan-anderson.jpg",
+      "linkedinUrl": "https://www.linkedin.com/in/jonathan-anderson-tjitrabudi",
+      "type": "REVIEWER"
+    },
+    {
+      "slug": "rafi-rizky",
+      "name": "Rafi Rizky",
+      "role": "SEO & Content Marketing Specialist",
+      "bio": "Rafi Rizky adalah digital marketing specialist yang berfokus pada SEO dan Content Marketing. Ia memiliki pengalaman dalam mengembangkan strategi konten berbasis search intent, optimasi SEO, serta pembuatan konten yang informatif dan relevan bagi audiens.",
+      "avatarUrl": "https://optimark.ai/images/blog/people/rafi-rizky.jpg",
+      "linkedinUrl": "https://www.linkedin.com/in/rafirizky",
+      "type": "AUTHOR"
+    },
+    {
+      "slug": "thia-rahmani",
+      "name": "Thia Rahmani",
+      "role": "Social Media & Visual Content Specialist",
+      "bio": "Thia Rahmani adalah digital marketing specialist yang berfokus pada Social Media Marketing dan Visual Content. Ia memiliki pengalaman dalam mengembangkan ide konten, menyusun strategi media sosial, serta membuat materi visual yang relevan dengan kebutuhan brand dan audiens.",
+      "avatarUrl": "https://optimark.ai/images/blog/people/thia-rahmani.jpg",
+      "linkedinUrl": "https://www.linkedin.com/in/thiarahmani",
+      "type": "AUTHOR"
+    }
+  ],
+  "articles": [
+    {
+      "slug": "riset-keyword-bisnis-lokal",
+      "categorySlug": "seo",
+      "publishedAt": "2026-10-01T00:00:00.000Z",
+      "contentUpdatedAt": "2026-10-02T00:00:00.000Z",
+      "readMinutes": 6,
+      "coverImageUrl": "https://optimark.ai/images/blog/riset-keyword-bisnis-lokal.jpg",
+      "tags": [
+        "riset-keyword",
+        "seo-lokal",
+        "umkm",
+        "google-autocomplete"
+      ],
+      "authorSlug": "rafi-rizky",
+      "reviewerSlug": "jonathan-anderson",
+      "featured": true,
+      "title": "Cara Riset Keyword untuk Bisnis Lokal Tanpa Tools Berbayar",
+      "excerpt": "Kata kunci yang dicari pelanggan di sekitar Anda bisa ditemukan dari Google sendiri, tanpa langganan tools SEO.",
+      "metaTitle": "Cara Riset Keyword untuk Bisnis Lokal Tanpa Tools Berbayar - Blog OPTIMARK",
+      "metaDescription": "Kata kunci yang dicari pelanggan di sekitar Anda bisa ditemukan dari Google sendiri, tanpa langganan tools SEO.",
+      "coverImageAlt": "Pemilik toko roti sedang riset keyword di laptop",
+      "canonicalUrl": "https://optimark.ai/blog/riset-keyword-bisnis-lokal",
+      "content": "Riset keyword adalah langkah awal penting sebelum membuat konten digital. Meskipun ada banyak tool berbayar, Anda tetap bisa memulai riset keyword untuk bisnis lokal dengan cara manual yang efektif. Artikel ini membahas cara memulai riset keyword tanpa biaya tambahan, mulai dari memahami kebutuhan bisnis, mencari kata kunci relevan, hingga menentukan prioritas konten yang tepat.\n\n## 1. Pahami kebutuhan bisnis Anda\n\nSebelum mencari keyword, kenali dulu siapa target audiens Anda dan apa yang mereka cari. Bisnis lokal seperti toko makanan, jasa servis, atau klinik kecantikan memiliki kebutuhan yang berbeda-beda. Misalnya, jika Anda memiliki toko makanan di Jakarta Selatan, target Anda mungkin orang-orang yang mencari “restoran dekat sini” atau “menu makan siang murah”.\n\nSebelum lanjut, jawab tiga pertanyaan ini:\n\n- Siapa pelanggan utama Anda dan di area mana mereka berada?\n- Masalah apa yang ingin mereka selesaikan?\n- Kata apa yang mereka pakai saat bertanya ke teman atau di media sosial?\n\n## 2. Gunakan Google Autocomplete\n\nKetikkan kata kunci utama Anda di Google, lalu lihat saran yang muncul. Fitur autocomplete ini menunjukkan apa yang paling sering dicari orang. Contohnya, jika Anda mengetik “cuci ac”, Google mungkin menyarankan “cuci ac jakarta”, “cuci ac bandung”, atau “cuci ac murah”. Ini membantu Anda menemukan long-tail keyword yang spesifik dan memiliki kompetisi lebih rendah.\n\n### Catat pola yang muncul\n\nSalin setiap saran ke spreadsheet sederhana, lalu kelompokkan berdasarkan lokasi, harga, atau jenis layanan. Pola yang paling sering muncul adalah topik yang paling layak dibuatkan konten.\n\n![Kelompokkan saran autocomplete berdasarkan pola supaya prioritas kontennya terlihat.](https://optimark.ai/images/blog/artikel-jadi-konten-media-sosial.jpg)\n*Kelompokkan saran autocomplete berdasarkan pola supaya prioritas kontennya terlihat.*\n\n### Bandingkan dengan Google Trends\n\nUntuk membandingkan dua keyword, buka [Google Trends](https://trends.google.com/trends/?geo=ID) dan pilih wilayah Indonesia. Anda bisa melihat keyword mana yang lebih sering dicari dan kapan minatnya naik.\n\n## 3. Analisis kompetitor\n\nLihat website kompetitor Anda. Perhatikan judul halaman, deskripsi meta, dan subjudul mereka. Ini memberikan gambaran tentang keyword apa yang mereka targetkan. Jangan lupa untuk mencatat juga kekurangan konten mereka, sehingga Anda bisa membuat konten yang lebih lengkap dan relevan.\n\nLakukan tiga langkah ini untuk setiap keyword utama:\n\n1. Cari keyword utama Anda di Google dan buka tiga hasil teratas.\n2. Catat judul, deskripsi meta, dan subjudul di setiap halaman.\n3. Tandai topik yang belum mereka bahas, lalu jadikan bahan konten Anda.\n\n## 4. Prioritaskan keyword lokal\n\nJika bisnis Anda berfokus pada area tertentu, pastikan untuk menyertakan nama kota atau wilayah. Misalnya, “jasa fotocopy jakarta timur” atau “kursus memasak bogor”. Keyword lokal memiliki volume pencarian yang lebih kecil, tapi konversinya lebih tinggi karena orang yang mencari biasanya sudah siap untuk melakukan aksi.\n\n> Keyword lokal memang jarang dicari, tapi orang yang mengetiknya biasanya sudah siap datang ke toko Anda.\n> — *Jonathan Anderson T., SEO Lead & Editorial Reviewer*\n\nKalau website Anda belum juga muncul di hasil pencarian, cek penyebabnya di artikel [kenapa website belum muncul di halaman pertama Google](/blog/website-belum-muncul-di-google).\n\n## Penutup\n\nRiset keyword tanpa tools berbayar memang membutuhkan waktu lebih lama, tapi hasilnya sangat berharga. Dengan memahami kebutuhan audiens dan menggunakan sumber daya gratis seperti Google, Anda bisa membuat konten yang relevan dan meningkatkan visibilitas bisnis lokal Anda di mesin pencari."
+    },
+    {
+      "slug": "jadwal-posting-instagram-umkm-kuliner",
+      "categorySlug": "social-media",
+      "publishedAt": "2026-09-29T00:00:00.000Z",
+      "contentUpdatedAt": null,
+      "readMinutes": 4,
+      "coverImageUrl": "https://optimark.ai/images/blog/jadwal-posting-instagram-umkm-kuliner.jpg",
+      "tags": [
+        "instagram",
+        "umkm-kuliner",
+        "jadwal-posting"
+      ],
+      "authorSlug": "thia-rahmani",
+      "reviewerSlug": "jonathan-anderson",
+      "featured": true,
+      "title": "Jadwal Posting Instagram Terbaik untuk UMKM Kuliner di Tahun 2026",
+      "excerpt": "Jam posting terbaik bukan angka universal. Untuk bisnis kuliner, jam lapar pelanggan Anda adalah patokannya.",
+      "metaTitle": "Jadwal Posting Instagram Terbaik untuk UMKM Kuliner di Tahun 2026 - Blog OPTIMARK",
+      "metaDescription": "Jam posting terbaik bukan angka universal. Untuk bisnis kuliner, jam lapar pelanggan Anda adalah patokannya.",
+      "coverImageAlt": "Pemilik warung makan memotret hidangan dengan ponsel untuk Instagram",
+      "canonicalUrl": "https://optimark.ai/blog/jadwal-posting-instagram-umkm-kuliner",
+      "content": "Artikel “jam terbaik posting Instagram” biasanya memberi satu angka untuk semua bisnis. Untuk kuliner, patokan yang lebih jujur adalah kapan pelanggan Anda mulai memikirkan makanan.\n\n## Ikuti jam makan, bukan jam kantor\n\nPosting 30–60 menit sebelum jam makan siang dan makan malam memberi waktu orang melihat, lalu memesan. Cek Insight akun Anda untuk memastikan polanya.\n\n- Uji slot 10.30–11.30 dan 16.30–17.30 selama dua minggu\n- Bandingkan jangkauan per slot di Instagram Insight\n- Simpan Reels menu baru untuk akhir pekan\n- Posting promo sehari sebelum hari gajian\n\n> **Catatan:** Ini artikel contoh yang dipakai untuk meninjau tampilan halaman blog. Gantilah dengan tulisan asli sebelum situs dipublikasikan."
+    },
+    {
+      "slug": "foto-produk-ai-smartphone",
+      "categorySlug": "visual-content",
+      "publishedAt": "2026-09-26T00:00:00.000Z",
+      "contentUpdatedAt": null,
+      "readMinutes": 5,
+      "coverImageUrl": "https://optimark.ai/images/blog/foto-produk-ai-smartphone.jpg",
+      "tags": [
+        "foto-produk",
+        "ai",
+        "smartphone"
+      ],
+      "authorSlug": "thia-rahmani",
+      "reviewerSlug": "jonathan-anderson",
+      "featured": false,
+      "title": "Panduan Membuat Foto Produk Menarik Pakai AI dari Smartphone",
+      "excerpt": "Foto dari smartphone plus sedikit bantuan AI sudah cukup untuk katalog yang rapi, asalkan bahan awalnya benar.",
+      "metaTitle": "Panduan Membuat Foto Produk Menarik Pakai AI dari Smartphone - Blog OPTIMARK",
+      "metaDescription": "Foto dari smartphone plus sedikit bantuan AI sudah cukup untuk katalog yang rapi, asalkan bahan awalnya benar.",
+      "coverImageAlt": "Memotret produk serum di atas meja kayu dengan smartphone",
+      "canonicalUrl": "https://optimark.ai/blog/foto-produk-ai-smartphone",
+      "content": "AI bisa membersihkan latar, merapikan cahaya, dan membuat variasi suasana. Tapi hasilnya hanya sebaik foto awal yang Anda ambil dengan smartphone.\n\n## Ambil foto awal yang bersih\n\nGunakan cahaya jendela dari samping, latar polos, dan posisi kamera sejajar produk. Foto yang tajam dan terang memberi AI bahan yang cukup untuk diolah.\n\n- Foto di dekat jendela, hindari lampu kuning\n- Bersihkan lensa sebelum memotret\n- Ambil beberapa sudut untuk setiap produk\n- Gunakan AI untuk latar dan variasi, bukan untuk mengubah bentuk produk\n\n> **Catatan:** Ini artikel contoh yang dipakai untuk meninjau tampilan halaman blog. Gantilah dengan tulisan asli sebelum situs dipublikasikan."
+    },
+    {
+      "slug": "strategi-content-pillar",
+      "categorySlug": "content-marketing",
+      "publishedAt": "2026-09-23T00:00:00.000Z",
+      "contentUpdatedAt": null,
+      "readMinutes": 7,
+      "coverImageUrl": "https://optimark.ai/images/blog/strategi-content-pillar.jpg",
+      "tags": [
+        "content-pillar",
+        "konsistensi",
+        "brand-kecil"
+      ],
+      "authorSlug": "rafi-rizky",
+      "reviewerSlug": "jonathan-anderson",
+      "featured": false,
+      "title": "Strategi Content Pillar yang Bikin Brand Kecil Tetap Konsisten Posting",
+      "excerpt": "Tiga sampai empat pilar konten membuat Anda tidak lagi bingung mau posting apa setiap pagi.",
+      "metaTitle": "Strategi Content Pillar yang Bikin Brand Kecil Tetap Konsisten Posting - Blog OPTIMARK",
+      "metaDescription": "Tiga sampai empat pilar konten membuat Anda tidak lagi bingung mau posting apa setiap pagi.",
+      "coverImageAlt": "Perempuan menyusun rencana konten di buku catatan di samping laptop dan sticky notes",
+      "canonicalUrl": "https://optimark.ai/blog/strategi-content-pillar",
+      "content": "Brand kecil jarang kehabisan ide karena malas. Biasanya karena setiap hari dimulai dari nol. Content pillar memberi kerangka supaya ide tidak perlu dicari ulang.\n\n## Pilih pilar dari pertanyaan pelanggan\n\nTulis pertanyaan yang paling sering diajukan pelanggan, lalu kelompokkan. Tiap kelompok bisa menjadi satu pilar, misalnya edukasi, produk, di balik layar, dan testimoni.\n\n- Batasi tiga sampai empat pilar\n- Tetapkan porsi tiap pilar per minggu\n- Siapkan lima ide cadangan per pilar\n- Tinjau pilar yang paling banyak disimpan dan dibagikan tiap bulan\n\n> **Catatan:** Ini artikel contoh yang dipakai untuk meninjau tampilan halaman blog. Gantilah dengan tulisan asli sebelum situs dipublikasikan."
+    },
+    {
+      "slug": "website-belum-muncul-di-google",
+      "categorySlug": "seo",
+      "publishedAt": "2026-09-19T00:00:00.000Z",
+      "contentUpdatedAt": null,
+      "readMinutes": 8,
+      "coverImageUrl": "https://optimark.ai/images/blog/website-belum-muncul-di-google.jpg",
+      "tags": [
+        "seo",
+        "google-search-console",
+        "indexing"
+      ],
+      "authorSlug": "rafi-rizky",
+      "reviewerSlug": "jonathan-anderson",
+      "featured": false,
+      "title": "Kenapa Website Kamu Belum Muncul di Halaman Pertama Google",
+      "excerpt": "Sebelum menyalahkan algoritma, periksa dulu apakah Google sudah bisa menemukan dan memahami halaman Anda.",
+      "metaTitle": "Kenapa Website Kamu Belum Muncul di Halaman Pertama Google - Blog OPTIMARK",
+      "metaDescription": "Sebelum menyalahkan algoritma, periksa dulu apakah Google sudah bisa menemukan dan memahami halaman Anda.",
+      "coverImageAlt": "Pria memeriksa website di laptop sambil mencatat",
+      "canonicalUrl": "https://optimark.ai/blog/website-belum-muncul-di-google",
+      "content": "Website yang tidak muncul di halaman pertama belum tentu kontennya buruk. Sering kali Google belum mengindeks halaman itu, atau tidak paham halaman itu menjawab pencarian apa.\n\n## Periksa indeks sebelum konten\n\nKetik site:domainanda.com di Google. Kalau halaman penting tidak muncul, masalahnya ada di pengindeksan, bukan di tulisan. Google Search Console bisa menunjukkan alasannya.\n\n- Daftarkan situs dan sitemap di Google Search Console\n- Pastikan setiap halaman punya judul dan H1 yang jelas\n- Perbaiki halaman yang lambat dibuka di ponsel\n- Tautkan halaman baru dari halaman lama yang sudah ramai\n\n> **Catatan:** Ini artikel contoh yang dipakai untuk meninjau tampilan halaman blog. Gantilah dengan tulisan asli sebelum situs dipublikasikan."
+    },
+    {
+      "slug": "warna-feed-instagram",
+      "categorySlug": "visual-content",
+      "publishedAt": "2026-09-16T00:00:00.000Z",
+      "contentUpdatedAt": null,
+      "readMinutes": 4,
+      "coverImageUrl": "https://optimark.ai/images/blog/warna-feed-instagram.jpg",
+      "tags": [
+        "instagram",
+        "branding",
+        "palet-warna"
+      ],
+      "authorSlug": "thia-rahmani",
+      "reviewerSlug": "jonathan-anderson",
+      "featured": false,
+      "title": "Tips Memilih Warna Feed Instagram yang Sesuai dengan Karakter Brand",
+      "excerpt": "Palet feed yang konsisten membuat akun mudah dikenali, bahkan sebelum orang membaca nama brand Anda.",
+      "metaTitle": "Tips Memilih Warna Feed Instagram yang Sesuai dengan Karakter Brand - Blog OPTIMARK",
+      "metaDescription": "Palet feed yang konsisten membuat akun mudah dikenali, bahkan sebelum orang membaca nama brand Anda.",
+      "coverImageAlt": "Pemilik usaha menata contoh warna dan bahan di atas meja kerja",
+      "canonicalUrl": "https://optimark.ai/blog/warna-feed-instagram",
+      "content": "Feed yang rapi bukan soal semua foto harus sama. Yang penting ada dua atau tiga warna yang terus muncul, sehingga akun Anda terasa punya satu karakter.\n\n## Turunkan warna dari logo dan produk\n\nAmbil satu warna utama dari logo, satu warna netral, dan satu aksen dari produk. Gunakan ketiganya di latar foto, teks, dan properti.\n\n- Batasi palet pada tiga warna\n- Simpan kode warna agar desainer dan fotografer sepakat\n- Pakai preset edit yang sama untuk semua foto\n- Lihat grid sembilan post terakhir sebelum mengunggah\n\n> **Catatan:** Ini artikel contoh yang dipakai untuk meninjau tampilan halaman blog. Gantilah dengan tulisan asli sebelum situs dipublikasikan."
+    },
+    {
+      "slug": "caption-tiktok",
+      "categorySlug": "social-media",
+      "publishedAt": "2026-09-12T00:00:00.000Z",
+      "contentUpdatedAt": null,
+      "readMinutes": 3,
+      "coverImageUrl": "https://optimark.ai/images/blog/caption-tiktok.jpg",
+      "tags": [
+        "tiktok",
+        "caption",
+        "engagement"
+      ],
+      "authorSlug": "thia-rahmani",
+      "reviewerSlug": "jonathan-anderson",
+      "featured": false,
+      "title": "Cara Menulis Caption TikTok yang Mendorong Penonton untuk Berinteraksi",
+      "excerpt": "Caption TikTok yang baik tidak mengulang isi video. Ia memberi penonton alasan untuk berkomentar.",
+      "metaTitle": "Cara Menulis Caption TikTok yang Mendorong Penonton untuk Berinteraksi - Blog OPTIMARK",
+      "metaDescription": "Caption TikTok yang baik tidak mengulang isi video. Ia memberi penonton alasan untuk berkomentar.",
+      "coverImageAlt": "Kreator merekam video TikTok dengan ponsel dan ring light",
+      "canonicalUrl": "https://optimark.ai/blog/caption-tiktok",
+      "content": "Penonton TikTok sudah melihat videonya. Caption yang hanya mengulang isi video tidak menambah apa-apa. Caption yang baik membuka percakapan.\n\n## Akhiri dengan pertanyaan yang mudah dijawab\n\nPertanyaan pilihan seperti “Tim pedas atau tim manis?” lebih mudah dijawab daripada pertanyaan terbuka. Semakin ringan jawabannya, semakin banyak yang berkomentar.\n\n- Taruh kalimat terpenting di baris pertama\n- Ajukan satu pertanyaan pilihan di akhir caption\n- Pakai tiga sampai lima hashtag yang relevan\n- Balas komentar awal dalam satu jam pertama\n\n> **Catatan:** Ini artikel contoh yang dipakai untuk meninjau tampilan halaman blog. Gantilah dengan tulisan asli sebelum situs dipublikasikan."
+    },
+    {
+      "slug": "artikel-jadi-konten-media-sosial",
+      "categorySlug": "content-marketing",
+      "publishedAt": "2026-09-09T00:00:00.000Z",
+      "contentUpdatedAt": null,
+      "readMinutes": 7,
+      "coverImageUrl": "https://optimark.ai/images/blog/artikel-jadi-konten-media-sosial.jpg",
+      "tags": [
+        "repurpose-konten",
+        "media-sosial",
+        "blog"
+      ],
+      "authorSlug": "rafi-rizky",
+      "reviewerSlug": "jonathan-anderson",
+      "featured": false,
+      "title": "Cara Mengubah Satu Artikel Blog Menjadi Sepuluh Konten Media Sosial",
+      "excerpt": "Satu artikel yang sudah diriset bisa menjadi bahan konten untuk dua minggu, tanpa menulis dari nol lagi.",
+      "metaTitle": "Cara Mengubah Satu Artikel Blog Menjadi Sepuluh Konten Media Sosial - Blog OPTIMARK",
+      "metaDescription": "Satu artikel yang sudah diriset bisa menjadi bahan konten untuk dua minggu, tanpa menulis dari nol lagi.",
+      "coverImageAlt": "Tim kecil merencanakan konten media sosial dengan kartu ide dan laptop",
+      "canonicalUrl": "https://optimark.ai/blog/artikel-jadi-konten-media-sosial",
+      "content": "Artikel blog yang baik berisi riset, contoh, dan kesimpulan. Semua itu bisa dipecah menjadi konten media sosial yang lebih pendek.\n\n## Pecah per poin, bukan per paragraf\n\nSetiap poin utama bisa menjadi satu carousel, setiap kutipan kuat menjadi satu post teks, dan setiap langkah praktis menjadi satu video singkat.\n\n- Satu carousel untuk ringkasan artikel\n- Tiga post kutipan dari kalimat terkuat\n- Tiga video singkat untuk tiap langkah praktis\n- Satu polling dan dua story untuk mengajak diskusi\n\n> **Catatan:** Ini artikel contoh yang dipakai untuk meninjau tampilan halaman blog. Gantilah dengan tulisan asli sebelum situs dipublikasikan."
+    },
+    {
+      "slug": "video-promosi-singkat",
+      "categorySlug": "visual-content",
+      "publishedAt": "2026-09-02T00:00:00.000Z",
+      "contentUpdatedAt": null,
+      "readMinutes": 5,
+      "coverImageUrl": "https://optimark.ai/images/blog/video-promosi-singkat.jpg",
+      "tags": [
+        "video",
+        "promosi",
+        "smartphone"
+      ],
+      "authorSlug": "thia-rahmani",
+      "reviewerSlug": "jonathan-anderson",
+      "featured": false,
+      "title": "Membuat Video Promosi Singkat yang Menarik Tanpa Harus Menyewa Editor",
+      "excerpt": "Video promosi 15 detik bisa direkam dan diedit sendiri dari smartphone, asalkan tiga detik pertamanya kuat.",
+      "metaTitle": "Membuat Video Promosi Singkat yang Menarik Tanpa Harus Menyewa Editor - Blog OPTIMARK",
+      "metaDescription": "Video promosi 15 detik bisa direkam dan diedit sendiri dari smartphone, asalkan tiga detik pertamanya kuat.",
+      "coverImageAlt": "Pemilik toko kain merekam video promosi dengan ponsel dan gimbal",
+      "canonicalUrl": "https://optimark.ai/blog/video-promosi-singkat",
+      "content": "Penonton memutuskan menonton atau menggeser dalam beberapa detik pertama. Editor profesional pun tidak bisa menyelamatkan video yang pembukaannya lemah.\n\n## Buka dengan hasil, bukan logo\n\nTunjukkan produk dipakai atau hasil akhirnya di detik pertama. Logo dan nama brand bisa muncul di akhir.\n\n- Rencanakan tiga adegan: hasil, proses, ajakan\n- Rekam dalam format vertikal 9:16\n- Tambahkan teks di layar untuk yang menonton tanpa suara\n- Batasi durasi 15–30 detik\n\n> **Catatan:** Ini artikel contoh yang dipakai untuk meninjau tampilan halaman blog. Gantilah dengan tulisan asli sebelum situs dipublikasikan."
+    },
+    {
+      "slug": "target-audiens",
+      "categorySlug": "content-marketing",
+      "publishedAt": "2026-08-28T00:00:00.000Z",
+      "contentUpdatedAt": null,
+      "readMinutes": 4,
+      "coverImageUrl": "https://optimark.ai/images/blog/target-audiens.jpg",
+      "tags": [
+        "target-audiens",
+        "bisnis-online",
+        "riset-pelanggan"
+      ],
+      "authorSlug": "rafi-rizky",
+      "reviewerSlug": "jonathan-anderson",
+      "featured": false,
+      "title": "Menentukan Target Audiens Sebelum Mulai Membuat Konten untuk Bisnis Online",
+      "excerpt": "Konten untuk semua orang biasanya tidak menarik siapa pun. Tentukan dulu siapa yang Anda ajak bicara.",
+      "metaTitle": "Menentukan Target Audiens Sebelum Mulai Membuat Konten untuk Bisnis Online - Blog OPTIMARK",
+      "metaDescription": "Konten untuk semua orang biasanya tidak menarik siapa pun. Tentukan dulu siapa yang Anda ajak bicara.",
+      "coverImageAlt": "Dua orang berdiskusi tentang target audiens di depan dinding sticky notes",
+      "canonicalUrl": "https://optimark.ai/blog/target-audiens",
+      "content": "Banyak bisnis online mulai membuat konten sebelum tahu siapa pembacanya. Hasilnya konten yang sopan, tapi tidak terasa ditujukan untuk siapa pun.\n\n## Mulai dari pelanggan yang sudah membeli\n\nLihat sepuluh pelanggan terakhir Anda: usia, pekerjaan, kota, dan alasan mereka membeli. Pola yang muncul adalah titik awal target audiens.\n\n- Wawancarai tiga pelanggan tentang alasan mereka membeli\n- Tulis satu paragraf profil pelanggan ideal\n- Catat kata-kata yang mereka pakai saat bertanya\n- Uji konten ke satu segmen dulu sebelum melebar\n\n> **Catatan:** Ini artikel contoh yang dipakai untuk meninjau tampilan halaman blog. Gantilah dengan tulisan asli sebelum situs dipublikasikan."
+    },
+    {
+      "slug": "insight-instagram",
+      "categorySlug": "social-media",
+      "publishedAt": "2026-08-25T00:00:00.000Z",
+      "contentUpdatedAt": null,
+      "readMinutes": 6,
+      "coverImageUrl": "https://optimark.ai/images/blog/insight-instagram.jpg",
+      "tags": [
+        "instagram-insight",
+        "analitik",
+        "engagement"
+      ],
+      "authorSlug": "thia-rahmani",
+      "reviewerSlug": "jonathan-anderson",
+      "featured": false,
+      "title": "Membaca Insight Instagram untuk Mengetahui Konten Mana yang Paling Efektif",
+      "excerpt": "Jumlah like bukan satu-satunya ukuran. Simpan dan bagikan sering lebih jujur menunjukkan konten yang berguna.",
+      "metaTitle": "Membaca Insight Instagram untuk Mengetahui Konten Mana yang Paling Efektif - Blog OPTIMARK",
+      "metaDescription": "Jumlah like bukan satu-satunya ukuran. Simpan dan bagikan sering lebih jujur menunjukkan konten yang berguna.",
+      "coverImageAlt": "Perempuan memeriksa Instagram Insight di ponsel sambil duduk di kafe",
+      "canonicalUrl": "https://optimark.ai/blog/insight-instagram",
+      "content": "Instagram Insight menyediakan banyak angka, dan mudah tersesat di dalamnya. Beberapa metrik saja sudah cukup untuk menentukan konten apa yang perlu diulang.\n\n## Fokus pada simpan dan bagikan\n\nKonten yang disimpan dianggap berguna, konten yang dibagikan dianggap layak direkomendasikan. Dua metrik ini lebih mencerminkan nilai konten daripada like.\n\n- Bandingkan post per format: foto, carousel, Reels\n- Urutkan post berdasarkan jumlah simpan\n- Catat jam posting dari lima post terbaik\n- Ulangi topik terbaik dengan format berbeda\n\n> **Catatan:** Ini artikel contoh yang dipakai untuk meninjau tampilan halaman blog. Gantilah dengan tulisan asli sebelum situs dipublikasikan."
+    }
+  ]
+}

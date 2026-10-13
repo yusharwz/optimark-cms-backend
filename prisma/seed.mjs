@@ -1,131 +1,152 @@
 import 'dotenv/config';
-import { PrismaClient, PersonType, ArticleStatus } from '@prisma/client';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { PrismaClient } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const connectionString = process.env.DATABASE_URL;
 if (!connectionString) {
-  throw new Error('DATABASE_URL is not defined');
+  throw new Error('DATABASE_URL is not defined in .env');
 }
 
 const schema = new URL(connectionString).searchParams.get('schema') || 'optimark_cms';
 const adapter = new PrismaPg({ connectionString }, { schema });
 const prisma = new PrismaClient({ adapter });
 
+function extractTOC(content) {
+  if (!content) return [];
+  const items = [];
+  const lines = content.split('\n');
+  const seenIds = new Set();
+
+  for (const line of lines) {
+    const match = line.trim().match(/^(#{1,4})\s+(.+)$/);
+    if (match) {
+      const level = match[1].length;
+      const text = match[2].replace(/[*_`]/g, '').trim();
+      let id = text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'heading';
+      let count = 1;
+      let uniqueId = id;
+      while (seenIds.has(uniqueId)) {
+        uniqueId = `${id}-${count++}`;
+      }
+      seenIds.add(uniqueId);
+      items.push({ id: uniqueId, level, text });
+    }
+  }
+  return items;
+}
+
 async function main() {
-  console.log('🌱 Seeding Optimark CMS Database...');
+  console.log('🌱 [Manual Seed] Starting production seed from https://optimark.ai/blog...');
+
+  const raw = fs.readFileSync(path.join(__dirname, 'production-seed.json'), 'utf-8');
+  const { categories, people, articles } = JSON.parse(raw);
 
   // 1. Categories
-  const categories = [
-    { name: 'SEO & Search', slug: 'seo-search', description: 'Strategi optimasi mesin pencari dan visibilitas organik', sortOrder: 1 },
-    { name: 'AI & Automasi', slug: 'ai-automasi', description: 'Pemanfaatan AI untuk pembuatan konten dan efisiensi', sortOrder: 2 },
-    { name: 'Strategi Konten', slug: 'strategi-konten', description: 'Panduan copywriting, content planning, dan editorial', sortOrder: 3 },
-    { name: 'Bisnis & Pertumbuhan', slug: 'bisnis-pertumbuhan', description: 'Analisis pasar, konversi, dan ROI konten', sortOrder: 4 },
-  ];
-
+  const categoryMap = new Map();
   for (const cat of categories) {
-    await prisma.category.upsert({
+    const record = await prisma.category.upsert({
       where: { slug: cat.slug },
       update: cat,
       create: cat,
     });
+    categoryMap.set(cat.slug, record.id);
   }
-  console.log('✅ Categories seeded');
+  console.log(`✅ Categories seeded: ${categoryMap.size} categories`);
 
-  // 2. People (E-E-A-T Author & Reviewer)
-  const people = [
-    {
-      name: 'Jonathan Anderson',
-      slug: 'jonathan-anderson',
-      role: 'Head of Content & SEO Strategy',
-      bio: 'Praktisi SEO dengan pengalaman 10+ tahun dalam scaling organic traffic dan arsitektur konten enterprise.',
-      avatarUrl: 'https://file.usahakreatif.co.id/optimark/avatars/jonathan-anderson.webp',
-      linkedinUrl: 'https://linkedin.com/in/jonathan-anderson-seo',
-      type: PersonType.BOTH,
-    },
-    {
-      name: 'Sarah Jenkins',
-      slug: 'sarah-jenkins',
-      role: 'Senior AI Content Researcher',
-      bio: 'Spesialis generative AI workflow dan evaluasi E-E-A-T search engine guidelines.',
-      avatarUrl: 'https://file.usahakreatif.co.id/optimark/avatars/sarah-jenkins.webp',
-      linkedinUrl: 'https://linkedin.com/in/sarah-jenkins-ai',
-      type: PersonType.REVIEWER,
-    },
-  ];
-
-  for (const person of people) {
-    await prisma.person.upsert({
-      where: { slug: person.slug },
-      update: person,
-      create: person,
+  // 2. People
+  const personMap = new Map();
+  for (const p of people) {
+    const record = await prisma.person.upsert({
+      where: { slug: p.slug },
+      update: {
+        name: p.name,
+        role: p.role,
+        bio: p.bio,
+        avatarUrl: p.avatarUrl,
+        linkedinUrl: p.linkedinUrl,
+        type: p.type,
+      },
+      create: {
+        name: p.name,
+        slug: p.slug,
+        role: p.role,
+        bio: p.bio,
+        avatarUrl: p.avatarUrl,
+        linkedinUrl: p.linkedinUrl,
+        type: p.type,
+      },
     });
+    personMap.set(p.slug, record.id);
   }
-  console.log('✅ People (Authors & Reviewers) seeded');
+  console.log(`✅ People (E-E-A-T) seeded: ${personMap.size} profiles`);
 
-  // 3. Sample Published Article
-  const author = await prisma.person.findUnique({ where: { slug: 'jonathan-anderson' } });
-  const reviewer = await prisma.person.findUnique({ where: { slug: 'sarah-jenkins' } });
-  const category = await prisma.category.findUnique({ where: { slug: 'seo-search' } });
+  // 3. Articles
+  let createdCount = 0;
+  for (const art of articles) {
+    const categoryId = categoryMap.get(art.categorySlug);
+    const authorId = personMap.get(art.authorSlug);
+    const reviewerId = personMap.get(art.reviewerSlug);
+    const toc = extractTOC(art.content);
 
-  const samplePost = {
-    title: 'Panduan Lengkap SEO Berbasis AI untuk Meningkatkan Trafik Organik 2026',
-    slug: 'panduan-lengkap-seo-ai-organik-2026',
-    excerpt: 'Pelajari bagaimana mengombinasikan kecerdasan buatan dan prinsip E-E-A-T Google untuk mendominasi peringkat mesin pencari di tahun 2026.',
-    metaTitle: 'Panduan Lengkap SEO AI 2026 | Optimark',
-    metaDescription: 'Strategi praktis riset keyword, konten terstruktur, dan optimasi E-E-A-T menggunakan teknologi AI terbaru.',
-    canonicalUrl: 'https://optimark.ai/blog/panduan-lengkap-seo-ai-organik-2026',
-    coverImageUrl: 'https://file.usahakreatif.co.id/optimark/blog-covers/seo-ai-guide-cover.webp',
-    coverImageAlt: 'Grafik peningkatan trafik organik SEO menggunakan AI',
-    tags: ['SEO', 'Artificial Intelligence', 'Organic Traffic', 'Content Strategy'],
-    readMinutes: 6,
-    status: ArticleStatus.PUBLISHED,
-    featured: true,
-    publishedAt: new Date(),
-    contentUpdatedAt: new Date(),
-    categoryId: category?.id,
-    authorId: author?.id,
-    reviewerId: reviewer?.id,
-    content: `# Panduan Lengkap SEO Berbasis AI untuk Meningkatkan Trafik Organik 2026
-
-Perkembangan algoritma pencarian menuntut pendekatan yang lebih terukur dalam memproduksi konten berkualitas tinggi.
-
-## 1. Memahami Algoritma Pencarian Modern
-Search engine kini semakin memprioritaskan pemahaman konteks semantik dibandingkan sekadar kepadatan kata kunci.
-
-### Faktor E-E-A-T yang Krusial
-Experience, Expertise, Authoritativeness, dan Trustworthiness menjadi pilar utama dalam menentukan kelayakan sebuah artikel untuk tampil di posisi teratas.
-
-## 2. Struktur Konten yang SEO-Friendly
-Penggunaan heading H1 hingga H4 yang hierarkis membantu bot mesin pencari dan pembaca memahami alur informasi secara cepat.
-
-### Tabel Konten Otomatis
-Daftar isi interaktif meningkatkan retensi pengguna dan menghasilkan sitelinks di SERP Google.
-
-## 3. Kesimpulan & Rekomendasi Praktis
-Kombinasi AI dan editorial manusia menghasilkan konten yang tidak hanya cepat dibuat, namun juga berdaya saing tinggi.`,
-    tableOfContents: [
-      { id: 'panduan-lengkap-seo-berbasis-ai-untuk-meningkatkan-trafik-organik-2026', level: 1, text: 'Panduan Lengkap SEO Berbasis AI untuk Meningkatkan Trafik Organik 2026' },
-      { id: '1-memahami-algoritma-pencarian-modern', level: 2, text: '1. Memahami Algoritma Pencarian Modern' },
-      { id: 'faktor-e-e-a-t-yang-krusial', level: 3, text: 'Faktor E-E-A-T yang Krusial' },
-      { id: '2-struktur-konten-yang-seo-friendly', level: 2, text: '2. Struktur Konten yang SEO-Friendly' },
-      { id: 'tabel-konten-otomatis', level: 3, text: 'Tabel Konten Otomatis' },
-      { id: '3-kesimpulan-rekomendasi-praktis', level: 2, text: '3. Kesimpulan & Rekomendasi Praktis' },
-    ],
-  };
-
-  await prisma.article.upsert({
-    where: { slug: samplePost.slug },
-    update: samplePost,
-    create: samplePost,
-  });
-
-  console.log('✅ Sample published article seeded');
-  console.log('🎉 Database seeding complete!');
+    await prisma.article.upsert({
+      where: { slug: art.slug },
+      update: {
+        title: art.title,
+        excerpt: art.excerpt,
+        content: art.content,
+        metaTitle: art.metaTitle,
+        metaDescription: art.metaDescription,
+        coverImageUrl: art.coverImageUrl,
+        coverImageAlt: art.coverImageAlt,
+        canonicalUrl: art.canonicalUrl,
+        tags: art.tags,
+        readMinutes: art.readMinutes,
+        status: 'PUBLISHED',
+        featured: art.featured,
+        tableOfContents: toc,
+        publishedAt: new Date(art.publishedAt),
+        contentUpdatedAt: art.contentUpdatedAt ? new Date(art.contentUpdatedAt) : null,
+        categoryId,
+        authorId,
+        reviewerId,
+      },
+      create: {
+        title: art.title,
+        slug: art.slug,
+        excerpt: art.excerpt,
+        content: art.content,
+        metaTitle: art.metaTitle,
+        metaDescription: art.metaDescription,
+        coverImageUrl: art.coverImageUrl,
+        coverImageAlt: art.coverImageAlt,
+        canonicalUrl: art.canonicalUrl,
+        tags: art.tags,
+        readMinutes: art.readMinutes,
+        status: 'PUBLISHED',
+        featured: art.featured,
+        tableOfContents: toc,
+        publishedAt: new Date(art.publishedAt),
+        contentUpdatedAt: art.contentUpdatedAt ? new Date(art.contentUpdatedAt) : null,
+        categoryId,
+        authorId,
+        reviewerId,
+      },
+    });
+    createdCount++;
+  }
+  console.log(`✅ Articles seeded: ${createdCount} published articles`);
+  console.log('🎉 Production articles seeding complete!');
 }
 
 main()
   .catch((e) => {
-    console.error('❌ Seeding failed:', e);
+    console.error('❌ Seeding error:', e);
     process.exit(1);
   })
   .finally(async () => {

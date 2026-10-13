@@ -8,6 +8,7 @@ import { PeopleModule } from './people/people.module';
 import { RedirectsModule } from './redirects/redirects.module';
 import { MediaModule } from './media/media.module';
 import { PublicModule } from './public/public.module';
+import { SeedModule } from './seed/seed.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { PublicModule } from './public/public.module';
     RedirectsModule,
     MediaModule,
     PublicModule,
+    SeedModule,
   ],
 })
 export class AppModule {}
