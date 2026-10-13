@@ -82,7 +82,8 @@ export class ArticlesService {
         category: article.category,
         author: article.author,
         reviewer: article.reviewer,
-      });
+        translations: article.translations,
+        });
 
       await this.revalidationService.revalidateArticle(article.slug);
     } catch (err: any) {
@@ -133,9 +134,43 @@ export class ArticlesService {
     };
 
     const created = await this.repository.create(data);
-    await this.syncAndRevalidate(created);
 
-    return created;
+    if (dto.translations) {
+      for (const locale of ['id', 'en'] as const) {
+        const tr = dto.translations[locale];
+        if (tr && (tr.title || tr.content)) {
+          await this.prisma.articleTranslation.upsert({
+            where: {
+              articleId_locale: {
+                articleId: created.id,
+                locale,
+              },
+            },
+            update: {
+              title: tr.title || created.title,
+              excerpt: tr.excerpt ?? created.excerpt,
+              content: tr.content || created.content,
+              metaTitle: tr.metaTitle ?? created.metaTitle,
+              metaDescription: tr.metaDescription ?? created.metaDescription,
+            },
+            create: {
+              articleId: created.id,
+              locale,
+              title: tr.title || created.title,
+              excerpt: tr.excerpt ?? created.excerpt,
+              content: tr.content || created.content,
+              metaTitle: tr.metaTitle ?? created.metaTitle,
+              metaDescription: tr.metaDescription ?? created.metaDescription,
+            },
+          });
+        }
+      }
+    }
+
+    const fullArticle = await this.findById(created.id);
+    await this.syncAndRevalidate(fullArticle);
+
+    return fullArticle;
   }
 
   async findAll(query: QueryArticleDto) {
@@ -254,14 +289,48 @@ export class ArticlesService {
     };
 
     const updated = await this.repository.update(id, data);
-    await this.syncAndRevalidate(updated);
+
+    if (dto.translations) {
+      for (const locale of ['id', 'en'] as const) {
+        const tr = dto.translations[locale];
+        if (tr) {
+          await this.prisma.articleTranslation.upsert({
+            where: {
+              articleId_locale: {
+                articleId: id,
+                locale,
+              },
+            },
+            update: {
+              ...(tr.title ? { title: tr.title } : {}),
+              ...(tr.excerpt !== undefined ? { excerpt: tr.excerpt } : {}),
+              ...(tr.content ? { content: tr.content } : {}),
+              ...(tr.metaTitle !== undefined ? { metaTitle: tr.metaTitle } : {}),
+              ...(tr.metaDescription !== undefined ? { metaDescription: tr.metaDescription } : {}),
+            },
+            create: {
+              articleId: id,
+              locale,
+              title: tr.title || updated.title,
+              excerpt: tr.excerpt ?? updated.excerpt,
+              content: tr.content || updated.content,
+              metaTitle: tr.metaTitle ?? updated.metaTitle,
+              metaDescription: tr.metaDescription ?? updated.metaDescription,
+            },
+          });
+        }
+      }
+    }
+
+    const fullArticle = await this.findById(id);
+    await this.syncAndRevalidate(fullArticle);
 
     if (oldSlug !== updated.slug) {
       await this.landingSyncService.deleteArticle(oldSlug);
       await this.revalidationService.revalidateArticle(oldSlug);
     }
 
-    return updated;
+    return fullArticle;
   }
 
   async publishNow(id: string) {

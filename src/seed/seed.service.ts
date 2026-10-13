@@ -103,7 +103,7 @@ export class SeedService implements OnApplicationBootstrap {
 
       const toc = extractTableOfContents(art.content);
 
-      await this.prisma.article.upsert({
+      const article = await this.prisma.article.upsert({
         where: { slug: art.slug },
         update: {
           title: art.title,
@@ -122,7 +122,7 @@ export class SeedService implements OnApplicationBootstrap {
           publishedAt: new Date(art.publishedAt),
           contentUpdatedAt: art.contentUpdatedAt
             ? new Date(art.contentUpdatedAt)
-            : null,
+            : new Date(),
           categoryId,
           authorId,
           reviewerId,
@@ -145,12 +145,46 @@ export class SeedService implements OnApplicationBootstrap {
           publishedAt: new Date(art.publishedAt),
           contentUpdatedAt: art.contentUpdatedAt
             ? new Date(art.contentUpdatedAt)
-            : null,
+            : new Date(),
           categoryId,
           authorId,
           reviewerId,
         },
       });
+
+      // Seed Bilingual Translations
+      if (art.translations) {
+        for (const locale of ['id', 'en'] as const) {
+          const tr = art.translations[locale];
+          if (tr) {
+            await this.prisma.articleTranslation.upsert({
+              where: {
+                articleId_locale: {
+                  articleId: article.id,
+                  locale,
+                },
+              },
+              update: {
+                title: tr.title,
+                excerpt: tr.excerpt,
+                content: tr.content,
+                metaTitle: tr.metaTitle,
+                metaDescription: tr.metaDescription,
+              },
+              create: {
+                articleId: article.id,
+                locale,
+                title: tr.title,
+                excerpt: tr.excerpt,
+                content: tr.content,
+                metaTitle: tr.metaTitle,
+                metaDescription: tr.metaDescription,
+              },
+            });
+          }
+        }
+      }
+
       createdCount++;
     }
 

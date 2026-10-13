@@ -13,6 +13,7 @@ export class ArticlesRepository {
         category: true,
         author: true,
         reviewer: true,
+        translations: true,
       },
     });
   }
@@ -33,6 +34,7 @@ export class ArticlesRepository {
         category: true,
         author: true,
         reviewer: true,
+        translations: true,
       },
     });
   }
@@ -48,6 +50,7 @@ export class ArticlesRepository {
         category: true,
         author: true,
         reviewer: true,
+        translations: true,
       },
     });
   }
@@ -59,6 +62,7 @@ export class ArticlesRepository {
         category: true,
         author: true,
         reviewer: true,
+        translations: true,
       },
     });
   }
@@ -70,6 +74,7 @@ export class ArticlesRepository {
         category: true,
         author: true,
         reviewer: true,
+        translations: true,
       },
     });
   }
@@ -82,6 +87,7 @@ export class ArticlesRepository {
         category: true,
         author: true,
         reviewer: true,
+        translations: true,
       },
     });
   }

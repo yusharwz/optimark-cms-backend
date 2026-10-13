@@ -15,31 +15,28 @@ export interface SyncArticleInput {
   coverImageUrl?: string | null;
   coverImageAlt?: string | null;
   tags?: string[];
-  readMinutes: number;
-  status: 'DRAFT' | 'SCHEDULED' | 'PUBLISHED' | 'ARCHIVED';
+  readMinutes?: number;
+  status: string;
   featured?: boolean;
   publishedAt?: Date | null;
   contentUpdatedAt?: Date | null;
   createdAt?: Date;
-  category?: {
-    id: string;
-    slug: string;
-    name: string;
-  } | null;
-  author?: {
-    id: string;
-    slug: string;
-    name: string;
-    role?: string;
-    avatarUrl?: string | null;
-  } | null;
-  reviewer?: {
-    id: string;
-    slug: string;
-    name: string;
-    role?: string;
-    avatarUrl?: string | null;
-  } | null;
+  category?: any;
+  author?: any;
+  reviewer?: any;
+  translations?:
+    | Array<{
+        locale: string;
+        title: string;
+        excerpt?: string | null;
+        content: string;
+        metaTitle?: string | null;
+        metaDescription?: string | null;
+      }>
+    | {
+        id?: any;
+        en?: any;
+      };
 }
 
 @Injectable()
@@ -71,9 +68,9 @@ export class LandingSyncService {
 
     const catId = slug;
     await this.prisma.$executeRawUnsafe(
-      `INSERT INTO optimark_landing.blog_categories (id, slug, sort_order)
-       VALUES ($1, $2, 0)
-       ON CONFLICT (id) DO UPDATE SET slug = EXCLUDED.slug`,
+      `INSERT INTO optimark_landing.blog_categories (id, slug, sort_order, created_at, updated_at)
+       VALUES ($1, $2, 0, NOW(), NOW())
+       ON CONFLICT (id) DO UPDATE SET slug = EXCLUDED.slug, updated_at = NOW()`,
       catId,
       slug,
     );
@@ -115,9 +112,9 @@ export class LandingSyncService {
 
     const personId = slug;
     await this.prisma.$executeRawUnsafe(
-      `INSERT INTO optimark_landing.blog_people (id, slug, name, avatar_url)
-       VALUES ($1, $2, $3, $4)
-       ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name, avatar_url = EXCLUDED.avatar_url`,
+      `INSERT INTO optimark_landing.blog_people (id, slug, name, avatar_url, created_at, updated_at)
+       VALUES ($1, $2, $3, $4, NOW(), NOW())
+       ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name, avatar_url = EXCLUDED.avatar_url, updated_at = NOW()`,
       personId,
       slug,
       personName,
@@ -242,17 +239,24 @@ export class LandingSyncService {
       input.tags || [],
     );
 
-    // Convert Markdown content into structured BlogBlock[]
-    const blocks = markdownToBlocks(input.content);
-    const bodyJson = JSON.stringify(blocks);
-
-    const title = input.title;
-    const excerpt = input.excerpt || '';
-    const metaTitle = input.metaTitle || input.title;
-    const metaDescription = input.metaDescription || input.excerpt || '';
-
     // Upsert translations for 'id' and 'en'
     for (const locale of ['id', 'en']) {
+      let trData: any = null;
+      if (Array.isArray(input.translations)) {
+        trData = input.translations.find((t) => t.locale === locale);
+      } else if (input.translations && (input.translations as any)[locale]) {
+        trData = (input.translations as any)[locale];
+      }
+
+      const trTitle = trData?.title || input.title;
+      const trExcerpt = trData?.excerpt || input.excerpt || '';
+      const trMetaTitle = trData?.metaTitle || input.metaTitle || trTitle;
+      const trMetaDesc = trData?.metaDescription || input.metaDescription || trExcerpt || '';
+      const trContent = trData?.content || input.content;
+
+      const blocks = markdownToBlocks(trContent);
+      const bodyJson = JSON.stringify(blocks);
+
       await this.prisma.$executeRawUnsafe(
         `INSERT INTO optimark_landing.blog_post_translations (
           id, post_id, locale, title, excerpt, meta_title, meta_description, body
@@ -268,10 +272,10 @@ export class LandingSyncService {
         `trans_${postId}_${locale}`,
         postId,
         locale,
-        title,
-        excerpt,
-        metaTitle,
-        metaDescription,
+        trTitle,
+        trExcerpt,
+        trMetaTitle,
+        trMetaDesc,
         bodyJson,
       );
     }

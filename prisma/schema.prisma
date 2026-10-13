@@ -94,12 +94,32 @@ model Article {
   reviewer         Person?       @relation("ArticleReviewer", fields: [reviewerId], references: [id], onDelete: SetNull)
 
   comments         Comment[]
+  translations     ArticleTranslation[]
 
   @@index([status, publishedAt(sort: Desc)])
   @@index([categoryId])
   @@index([authorId])
   @@index([reviewerId])
   @@map("cms_articles")
+}
+
+model ArticleTranslation {
+  id              String   @id @default(cuid())
+  articleId       String   @map("article_id")
+  locale          String   // "id" | "en"
+  title           String
+  excerpt         String?
+  content         String   @db.Text
+  metaTitle       String?  @map("meta_title")
+  metaDescription String?  @map("meta_description")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  article         Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  @@unique([articleId, locale])
+  @@index([locale])
+  @@map("cms_article_translations")
 }
 
 model Comment {

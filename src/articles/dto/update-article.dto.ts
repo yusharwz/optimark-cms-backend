@@ -79,6 +79,24 @@ export class UpdateArticleDto {
   @IsOptional()
   reviewerId?: string;
 
+  @IsOptional()
+  translations?: {
+    id?: {
+      title?: string;
+      excerpt?: string;
+      content?: string;
+      metaTitle?: string;
+      metaDescription?: string;
+    };
+    en?: {
+      title?: string;
+      excerpt?: string;
+      content?: string;
+      metaTitle?: string;
+      metaDescription?: string;
+    };
+  };
+
   @IsInt()
   @IsOptional()
   readMinutes?: number;
