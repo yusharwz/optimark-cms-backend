@@ -1,0 +1,123 @@
+// Prisma Schema for Optimark SEO CMS Backend
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum ArticleStatus {
+  DRAFT
+  SCHEDULED
+  PUBLISHED
+  ARCHIVED
+}
+
+enum PersonType {
+  AUTHOR
+  REVIEWER
+  BOTH
+}
+
+model Category {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  description String?
+  sortOrder   Int       @default(0) @map("sort_order")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  articles    Article[]
+
+  @@map("cms_categories")
+}
+
+model Person {
+  id          String     @id @default(cuid())
+  name        String
+  slug        String     @unique
+  role        String     // e.g. "Content Strategist", "SEO Lead & Reviewer"
+  bio         String?
+  avatarUrl   String?    @map("avatar_url")
+  linkedinUrl String?    @map("linkedin_url")
+  type        PersonType @default(BOTH)
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @updatedAt @map("updated_at")
+
+  authoredArticles Article[] @relation("ArticleAuthor")
+  reviewedArticles Article[] @relation("ArticleReviewer")
+
+  @@map("cms_people")
+}
+
+model Article {
+  id               String        @id @default(cuid())
+  title            String
+  slug             String        @unique
+  excerpt          String?
+  content          String        @db.Text // Full body text (Markdown / rich text)
+  metaTitle        String?       @map("meta_title")
+  metaDescription  String?       @map("meta_description")
+  canonicalUrl     String?       @map("canonical_url")
+  coverImageUrl    String?       @map("cover_image_url")
+  coverImageAlt    String?       @map("cover_image_alt")
+  tags             String[]      @default([])
+  readMinutes      Int           @default(5) @map("read_minutes")
+  status           ArticleStatus @default(DRAFT)
+  featured         Boolean       @default(false)
+  tableOfContents  Json?         @map("table_of_contents") // Array of { id, level, text }
+  previewToken     String        @unique @default(uuid()) @map("preview_token")
+
+  publishedAt      DateTime?     @map("published_at")
+  scheduledAt      DateTime?     @map("scheduled_at")
+  contentUpdatedAt DateTime?     @map("content_updated_at")
+  createdAt        DateTime      @default(now()) @map("created_at")
+  updatedAt        DateTime      @updatedAt @map("updated_at")
+
+  categoryId       String?       @map("category_id")
+  category         Category?     @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  authorId         String?       @map("author_id")
+  author           Person?       @relation("ArticleAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+
+  reviewerId       String?       @map("reviewer_id")
+  reviewer         Person?       @relation("ArticleReviewer", fields: [reviewerId], references: [id], onDelete: SetNull)
+
+  @@index([status, publishedAt(sort: Desc)])
+  @@index([categoryId])
+  @@index([authorId])
+  @@index([reviewerId])
+  @@map("cms_articles")
+}
+
+model Redirect {
+  id          String   @id @default(cuid())
+  sourcePath  String   @unique @map("source_path")
+  targetPath  String   @map("target_path")
+  statusCode  Int      @default(301) @map("status_code")
+  active      Boolean  @default(true)
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@index([active, sourcePath])
+  @@map("cms_redirects")
+}
+
+model Media {
+  id        String   @id @default(cuid())
+  url       String   @unique
+  key       String   @unique
+  filename  String
+  altText   String?  @map("alt_text")
+  mimeType  String   @map("mime_type")
+  size      Int
+  width     Int?
+  height    Int?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("cms_media")
+}
