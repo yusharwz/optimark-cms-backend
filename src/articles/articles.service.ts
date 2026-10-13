@@ -1,6 +1,9 @@
-import { Injectable, NotFoundException, ConflictException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException, BadRequestException, Logger } from '@nestjs/common';
 import { ArticlesRepository } from './articles.repository';
 import { RedirectsService } from '../redirects/redirects.service';
+import { LandingSyncService } from '../landing-sync/landing-sync.service';
+import { RevalidationService } from '../revalidation/revalidation.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { CreateArticleDto } from './dto/create-article.dto';
 import { UpdateArticleDto } from './dto/update-article.dto';
 import { QueryArticleDto } from './dto/query-article.dto';
@@ -10,14 +13,19 @@ import slugify from 'slugify';
 
 @Injectable()
 export class ArticlesService {
+  private readonly logger = new Logger(ArticlesService.name);
+
   constructor(
     private readonly repository: ArticlesRepository,
     private readonly redirectsService: RedirectsService,
+    private readonly landingSyncService: LandingSyncService,
+    private readonly revalidationService: RevalidationService,
+    private readonly prisma: PrismaService,
   ) {}
 
   private async generateUniqueSlug(title: string, customSlug?: string, excludeId?: string): Promise<string> {
     const raw = customSlug || title;
-    const baseSlug = slugify(raw, { lower: true, strict: true }) || 'post';
+    const baseSlug = slugify(raw, { lower: true, strict: true, trim: true }) || 'post';
     let slug = baseSlug;
     let counter = 1;
 
@@ -28,6 +36,57 @@ export class ArticlesService {
       }
       slug = `${baseSlug}-${counter}`;
       counter++;
+    }
+  }
+
+  private async resolveCategoryId(categoryIdOrSlug?: string): Promise<string | undefined> {
+    if (!categoryIdOrSlug) return undefined;
+    const cat = await this.prisma.category.findFirst({
+      where: {
+        OR: [{ id: categoryIdOrSlug }, { slug: categoryIdOrSlug }],
+      },
+    });
+    return cat?.id || categoryIdOrSlug;
+  }
+
+  private async resolvePersonId(personIdOrSlug?: string): Promise<string | undefined> {
+    if (!personIdOrSlug) return undefined;
+    const person = await this.prisma.person.findFirst({
+      where: {
+        OR: [{ id: personIdOrSlug }, { slug: personIdOrSlug }],
+      },
+    });
+    return person?.id || personIdOrSlug;
+  }
+
+  private async syncAndRevalidate(article: any) {
+    try {
+      await this.landingSyncService.syncArticle({
+        id: article.id,
+        title: article.title,
+        slug: article.slug,
+        excerpt: article.excerpt,
+        content: article.content,
+        metaTitle: article.metaTitle,
+        metaDescription: article.metaDescription,
+        canonicalUrl: article.canonicalUrl,
+        coverImageUrl: article.coverImageUrl,
+        coverImageAlt: article.coverImageAlt,
+        tags: article.tags,
+        readMinutes: article.readMinutes,
+        status: article.status,
+        featured: article.featured,
+        publishedAt: article.publishedAt,
+        contentUpdatedAt: article.contentUpdatedAt || new Date(),
+        createdAt: article.createdAt,
+        category: article.category,
+        author: article.author,
+        reviewer: article.reviewer,
+      });
+
+      await this.revalidationService.revalidateArticle(article.slug);
+    } catch (err: any) {
+      this.logger.error(`[ArticlesService] Sync/Revalidation error for '${article.slug}': ${err.message}`, err.stack);
     }
   }
 
@@ -45,6 +104,10 @@ export class ArticlesService {
     } else if (status === ArticleStatus.PUBLISHED && !publishedAt) {
       publishedAt = new Date();
     }
+
+    const categoryId = await this.resolveCategoryId(dto.categoryId);
+    const authorId = await this.resolvePersonId(dto.authorId);
+    const reviewerId = await this.resolvePersonId(dto.reviewerId);
 
     const data: Prisma.ArticleCreateInput = {
       title: dto.title,
@@ -64,12 +127,15 @@ export class ArticlesService {
       publishedAt,
       scheduledAt,
       contentUpdatedAt: publishedAt ? new Date() : null,
-      category: dto.categoryId ? { connect: { id: dto.categoryId } } : undefined,
-      author: dto.authorId ? { connect: { id: dto.authorId } } : undefined,
-      reviewer: dto.reviewerId ? { connect: { id: dto.reviewerId } } : undefined,
+      category: categoryId ? { connect: { id: categoryId } } : undefined,
+      author: authorId ? { connect: { id: authorId } } : undefined,
+      reviewer: reviewerId ? { connect: { id: reviewerId } } : undefined,
     };
 
-    return this.repository.create(data);
+    const created = await this.repository.create(data);
+    await this.syncAndRevalidate(created);
+
+    return created;
   }
 
   async findAll(query: QueryArticleDto) {
@@ -102,13 +168,11 @@ export class ArticlesService {
     ]);
 
     return {
-      data: items,
-      meta: {
-        total,
-        page,
-        limit,
-        totalPages: Math.ceil(total / limit),
-      },
+      items,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
     };
   }
 
@@ -140,9 +204,9 @@ export class ArticlesService {
     const current = await this.findById(id);
 
     let slug = current.slug;
+    const oldSlug = current.slug;
     if (dto.slug && dto.slug !== current.slug) {
       slug = await this.generateUniqueSlug(dto.title || current.title, dto.slug, id);
-      // Auto-record 301 redirect if article was published
       if (current.status === ArticleStatus.PUBLISHED) {
         await this.redirectsService.recordSlugChange(current.slug, slug);
       }
@@ -162,6 +226,10 @@ export class ArticlesService {
       publishedAt = new Date();
     }
 
+    const categoryId = dto.categoryId !== undefined ? await this.resolveCategoryId(dto.categoryId) : undefined;
+    const authorId = dto.authorId !== undefined ? await this.resolvePersonId(dto.authorId) : undefined;
+    const reviewerId = dto.reviewerId !== undefined ? await this.resolvePersonId(dto.reviewerId) : undefined;
+
     const data: Prisma.ArticleUpdateInput = {
       ...(dto.title ? { title: dto.title } : {}),
       slug,
@@ -180,54 +248,72 @@ export class ArticlesService {
       publishedAt,
       scheduledAt,
       contentUpdatedAt: new Date(),
-      category: dto.categoryId ? { connect: { id: dto.categoryId } } : undefined,
-      author: dto.authorId ? { connect: { id: dto.authorId } } : undefined,
-      reviewer: dto.reviewerId !== undefined ? (dto.reviewerId ? { connect: { id: dto.reviewerId } } : { disconnect: true }) : undefined,
+      category: categoryId ? { connect: { id: categoryId } } : undefined,
+      author: authorId ? { connect: { id: authorId } } : undefined,
+      reviewer: reviewerId !== undefined ? (reviewerId ? { connect: { id: reviewerId } } : { disconnect: true }) : undefined,
     };
 
-    return this.repository.update(id, data);
+    const updated = await this.repository.update(id, data);
+    await this.syncAndRevalidate(updated);
+
+    if (oldSlug !== updated.slug) {
+      await this.landingSyncService.deleteArticle(oldSlug);
+      await this.revalidationService.revalidateArticle(oldSlug);
+    }
+
+    return updated;
   }
 
   async publishNow(id: string) {
     const article = await this.findById(id);
     const now = new Date();
 
-    return this.repository.update(id, {
+    const updated = await this.repository.update(id, {
       status: ArticleStatus.PUBLISHED,
       publishedAt: article.publishedAt || now,
       contentUpdatedAt: now,
       scheduledAt: null,
     });
+
+    await this.syncAndRevalidate(updated);
+    return updated;
   }
 
   async unpublish(id: string) {
-    await this.findById(id);
-    return this.repository.update(id, {
+    const article = await this.findById(id);
+    const updated = await this.repository.update(id, {
       status: ArticleStatus.DRAFT,
       scheduledAt: null,
+      contentUpdatedAt: new Date(),
     });
+
+    await this.landingSyncService.unpublishArticle(article.slug);
+    await this.revalidationService.revalidateArticle(article.slug);
+
+    return updated;
   }
 
   async remove(id: string) {
-    await this.findById(id);
+    const article = await this.findById(id);
+    await this.landingSyncService.deleteArticle(article.slug);
+    await this.revalidationService.revalidateArticle(article.slug);
     return this.repository.delete(id);
   }
 
-  /**
-   * Cron worker function: publish scheduled articles whose scheduledAt <= now
-   */
   async processScheduledPublishing() {
     const now = new Date();
     const dueArticles = await this.repository.findDueScheduled(now);
 
     for (const article of dueArticles) {
-      await this.repository.update(article.id, {
+      const updated = await this.repository.update(article.id, {
         status: ArticleStatus.PUBLISHED,
         publishedAt: article.scheduledAt || now,
         contentUpdatedAt: now,
         scheduledAt: null,
       });
-      console.log(`[ArticlesScheduler] Automatically published article '${article.title}' (${article.id})`);
+
+      await this.syncAndRevalidate(updated);
+      this.logger.log(`[ArticlesScheduler] Automatically published article '${article.title}' (${article.id})`);
     }
 
     return dueArticles.length;

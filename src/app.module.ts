@@ -10,6 +10,8 @@ import { MediaModule } from './media/media.module';
 import { PublicModule } from './public/public.module';
 import { CommentsModule } from './comments/comments.module';
 import { SeedModule } from './seed/seed.module';
+import { LandingSyncModule } from './landing-sync/landing-sync.module';
+import { RevalidationModule } from './revalidation/revalidation.module';
 
 @Module({
   imports: [
@@ -27,6 +29,8 @@ import { SeedModule } from './seed/seed.module';
     PublicModule,
     CommentsModule,
     SeedModule,
+    LandingSyncModule,
+    RevalidationModule,
   ],
 })
 export class AppModule {}

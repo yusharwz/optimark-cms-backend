@@ -4,9 +4,11 @@ import { ArticlesController } from './articles.controller';
 import { ArticlesRepository } from './articles.repository';
 import { ArticlesScheduler } from './articles.scheduler';
 import { RedirectsModule } from '../redirects/redirects.module';
+import { LandingSyncModule } from '../landing-sync/landing-sync.module';
+import { RevalidationModule } from '../revalidation/revalidation.module';
 
 @Module({
-  imports: [RedirectsModule],
+  imports: [RedirectsModule, LandingSyncModule, RevalidationModule],
   controllers: [ArticlesController],
   providers: [ArticlesService, ArticlesRepository, ArticlesScheduler],
   exports: [ArticlesService, ArticlesRepository],
