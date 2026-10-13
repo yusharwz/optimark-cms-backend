@@ -8,6 +8,7 @@ import { PeopleModule } from './people/people.module';
 import { RedirectsModule } from './redirects/redirects.module';
 import { MediaModule } from './media/media.module';
 import { PublicModule } from './public/public.module';
+import { CommentsModule } from './comments/comments.module';
 import { SeedModule } from './seed/seed.module';
 
 @Module({
@@ -24,6 +25,7 @@ import { SeedModule } from './seed/seed.module';
     RedirectsModule,
     MediaModule,
     PublicModule,
+    CommentsModule,
     SeedModule,
   ],
 })

@@ -1,8 +1,10 @@
 import { Module } from '@nestjs/common';
 import { PublicService } from './public.service';
 import { PublicController } from './public.controller';
+import { CommentsModule } from '../comments/comments.module';
 
 @Module({
+  imports: [CommentsModule],
   controllers: [PublicController],
   providers: [PublicService],
   exports: [PublicService],

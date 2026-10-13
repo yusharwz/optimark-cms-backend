@@ -1,10 +1,24 @@
-import { Controller, Get, Param, Query, Res, HttpStatus } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Param,
+  Query,
+  Body,
+  Res,
+  HttpStatus,
+} from '@nestjs/common';
 import { Response } from 'express';
 import { PublicService } from './public.service';
+import { CommentsService } from '../comments/comments.service';
+import { CreateCommentDto } from '../comments/dto/create-comment.dto';
 
 @Controller('public')
 export class PublicController {
-  constructor(private readonly publicService: PublicService) {}
+  constructor(
+    private readonly publicService: PublicService,
+    private readonly commentsService: CommentsService,
+  ) {}
 
   @Get('posts')
   getPosts(
@@ -50,5 +64,35 @@ export class PublicController {
     res.set('Content-Type', 'application/xml');
     res.set('Cache-Control', 'public, max-age=3600, s-maxage=3600');
     res.status(HttpStatus.OK).send(xml);
+  }
+
+  /**
+   * Comments API for Landing Page
+   * Direct match for COMMENT_CONFIG.cmsApiUrl in optimark.landing-page
+   */
+  @Get('comments')
+  getComments(@Query('slug') slug: string) {
+    if (!slug) {
+      return [];
+    }
+    return this.commentsService.getApprovedCommentsBySlug(slug);
+  }
+
+  @Post('comments')
+  submitComment(@Body() dto: CreateCommentDto) {
+    return this.commentsService.submitComment(dto);
+  }
+
+  @Get('posts/:slug/comments')
+  getPostComments(@Param('slug') slug: string) {
+    return this.commentsService.getApprovedCommentsBySlug(slug);
+  }
+
+  @Post('posts/:slug/comments')
+  submitPostComment(
+    @Param('slug') slug: string,
+    @Body() dto: CreateCommentDto,
+  ) {
+    return this.commentsService.submitComment({ ...dto, slug });
   }
 }
