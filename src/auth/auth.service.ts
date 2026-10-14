@@ -1,15 +1,35 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, OnModuleInit } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma/prisma.service';
 import { LoginDto } from './dto/login.dto';
 import * as bcrypt from 'bcryptjs';
 
 @Injectable()
-export class AuthService {
+export class AuthService implements OnModuleInit {
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
   ) {}
+
+  async onModuleInit() {
+    try {
+      const userCount = await this.prisma.user.count();
+      if (userCount === 0) {
+        const defaultPasswordHash = bcrypt.hashSync('AdminOptimark2026!', 10);
+        await this.prisma.user.create({
+          data: {
+            email: 'admin@optimark.ai',
+            name: 'Admin Optimark',
+            role: 'ADMIN',
+            passwordHash: defaultPasswordHash,
+          },
+        });
+        console.log('✅ Auto-seeded root admin account: admin@optimark.ai');
+      }
+    } catch (err: any) {
+      console.warn('⚠️ Auto-seed admin notice:', err.message);
+    }
+  }
 
   async validateUser(email: string, pass: string) {
     const user = await this.prisma.user.findUnique({
