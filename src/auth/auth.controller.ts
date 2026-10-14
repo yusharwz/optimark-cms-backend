@@ -18,4 +18,9 @@ export class AuthController {
   async getMe(@CurrentUser() user: any) {
     return this.authService.getMe(user.id);
   }
+
+  @Post('reset-admin')
+  async resetAdmin() {
+    return this.authService.resetAdmin();
+  }
 }

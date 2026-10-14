@@ -140,4 +140,20 @@ export class AuthService implements OnModuleInit {
     const { passwordHash, ...result } = user;
     return result;
   }
+
+  async resetAdmin() {
+    const hash = bcrypt.hashSync('AdminOptimark2026!', 10);
+    const user = await this.prisma.user.upsert({
+      where: { email: 'admin@optimark.ai' },
+      update: { passwordHash: hash },
+      create: {
+        id: 'admin-root-id',
+        email: 'admin@optimark.ai',
+        name: 'Admin Optimark',
+        role: 'ADMIN',
+        passwordHash: hash,
+      },
+    });
+    return { success: true, email: user.email, name: user.name, role: user.role };
+  }
 }
