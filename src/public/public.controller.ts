@@ -23,6 +23,7 @@ export class PublicController {
   @Get('posts')
   getPosts(
     @Query('category') categorySlug?: string,
+    @Query('categorySlug') categorySlugAlt?: string,
     @Query('tag') tag?: string,
     @Query('search') search?: string,
     @Query('page') page?: string,
@@ -30,7 +31,8 @@ export class PublicController {
   ) {
     const p = page ? parseInt(page, 10) : 1;
     const l = limit ? parseInt(limit, 10) : 12;
-    return this.publicService.getPublishedPosts({ categorySlug, tag, search, page: p, limit: l });
+    const cat = categorySlug || categorySlugAlt;
+    return this.publicService.getPublishedPosts({ categorySlug: cat, tag, search, page: p, limit: l });
   }
 
   @Get('posts/:slug')
