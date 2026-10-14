@@ -15,9 +15,20 @@ export class AuthService implements OnModuleInit {
     try {
       await this.prisma.$executeRawUnsafe(`
         DO $$ BEGIN
-          CREATE TYPE "UserRole" AS ENUM ('ADMIN', 'EDITOR', 'AUTHOR');
+          ALTER TABLE cms_people ADD COLUMN IF NOT EXISTS role_id TEXT;
+          ALTER TABLE cms_people ADD COLUMN IF NOT EXISTS role_en TEXT;
+          ALTER TABLE cms_people ADD COLUMN IF NOT EXISTS position_id TEXT;
+          ALTER TABLE cms_people ADD COLUMN IF NOT EXISTS position_en TEXT;
+          ALTER TABLE cms_people ADD COLUMN IF NOT EXISTS bio_id TEXT;
+          ALTER TABLE cms_people ADD COLUMN IF NOT EXISTS bio_en TEXT;
+          ALTER TABLE cms_people ADD COLUMN IF NOT EXISTS expertise_id TEXT[] DEFAULT '{}';
+          ALTER TABLE cms_people ADD COLUMN IF NOT EXISTS expertise_en TEXT[] DEFAULT '{}';
+          ALTER TABLE cms_people ADD COLUMN IF NOT EXISTS experience_id JSONB;
+          ALTER TABLE cms_people ADD COLUMN IF NOT EXISTS experience_en JSONB;
+          ALTER TABLE cms_people ADD COLUMN IF NOT EXISTS education_id JSONB;
+          ALTER TABLE cms_people ADD COLUMN IF NOT EXISTS education_en JSONB;
         EXCEPTION
-          WHEN duplicate_object THEN null;
+          WHEN duplicate_column THEN null;
         END $$;
       `);
       await this.prisma.$executeRawUnsafe(`
@@ -189,5 +200,29 @@ export class AuthService implements OnModuleInit {
     }
 
     return { success: true, email: user.email, name: user.name, role: user.role };
+  }
+
+  async changePassword(userId: string, oldPass: string, newPass: string) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user) {
+      throw new UnauthorizedException('User tidak ditemukan');
+    }
+
+    const isMatch = bcrypt.compareSync(oldPass, user.passwordHash);
+    if (!isMatch) {
+      throw new UnauthorizedException('Kata sandi saat ini tidak valid');
+    }
+
+    if (!newPass || newPass.trim().length < 8) {
+      throw new UnauthorizedException('Kata sandi baru minimal 8 karakter');
+    }
+
+    const newHash = bcrypt.hashSync(newPass.trim(), 10);
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { passwordHash: newHash },
+    });
+
+    return { success: true, message: 'Kata sandi berhasil diperbarui' };
   }
 }

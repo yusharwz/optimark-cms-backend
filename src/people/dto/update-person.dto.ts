@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsEnum } from 'class-validator';
+import { IsString, IsOptional, IsEnum, IsArray } from 'class-validator';
 import { PersonType } from '@prisma/client';
 
 export class UpdatePersonDto {
@@ -16,7 +16,51 @@ export class UpdatePersonDto {
 
   @IsString()
   @IsOptional()
+  roleId?: string;
+
+  @IsString()
+  @IsOptional()
+  roleEn?: string;
+
+  @IsString()
+  @IsOptional()
+  positionId?: string;
+
+  @IsString()
+  @IsOptional()
+  positionEn?: string;
+
+  @IsString()
+  @IsOptional()
   bio?: string;
+
+  @IsString()
+  @IsOptional()
+  bioId?: string;
+
+  @IsString()
+  @IsOptional()
+  bioEn?: string;
+
+  @IsArray()
+  @IsOptional()
+  expertiseId?: string[];
+
+  @IsArray()
+  @IsOptional()
+  expertiseEn?: string[];
+
+  @IsOptional()
+  experienceId?: any;
+
+  @IsOptional()
+  experienceEn?: any;
+
+  @IsOptional()
+  educationId?: any;
+
+  @IsOptional()
+  educationEn?: any;
 
   @IsString()
   @IsOptional()
@@ -29,4 +73,17 @@ export class UpdatePersonDto {
   @IsEnum(PersonType)
   @IsOptional()
   type?: PersonType;
+
+  // Credential fields
+  @IsString()
+  @IsOptional()
+  email?: string;
+
+  @IsString()
+  @IsOptional()
+  password?: string;
+
+  @IsString()
+  @IsOptional()
+  userRole?: string;
 }

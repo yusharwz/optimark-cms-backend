@@ -63,16 +63,28 @@ model Category {
 }
 
 model Person {
-  id          String     @id @default(cuid())
-  name        String
-  slug        String     @unique
-  role        String     // e.g. "Content Strategist", "SEO Lead & Reviewer"
-  bio         String?
-  avatarUrl   String?    @map("avatar_url")
-  linkedinUrl String?    @map("linkedin_url")
-  type        PersonType @default(BOTH)
-  createdAt   DateTime   @default(now()) @map("created_at")
-  updatedAt   DateTime   @updatedAt @map("updated_at")
+  id           String      @id @default(cuid())
+  name         String
+  slug         String      @unique
+  role         String      // e.g. "Content Strategist", "SEO Lead & Reviewer"
+  roleId       String?     @map("role_id")
+  roleEn       String?     @map("role_en")
+  positionId   String?     @map("position_id")
+  positionEn   String?     @map("position_en")
+  bio          String?
+  bioId        String?     @map("bio_id")
+  bioEn        String?     @map("bio_en")
+  expertiseId  String[]    @default([]) @map("expertise_id")
+  expertiseEn  String[]    @default([]) @map("expertise_en")
+  experienceId Json?       @map("experience_id")
+  experienceEn Json?       @map("experience_en")
+  educationId  Json?       @map("education_id")
+  educationEn  Json?       @map("education_en")
+  avatarUrl    String?     @map("avatar_url")
+  linkedinUrl  String?     @map("linkedin_url")
+  type         PersonType  @default(BOTH)
+  createdAt    DateTime    @default(now()) @map("created_at")
+  updatedAt    DateTime    @updatedAt @map("updated_at")
 
   authoredArticles Article[] @relation("ArticleAuthor")
   reviewedArticles Article[] @relation("ArticleReviewer")

@@ -28,6 +28,21 @@ export class MediaController {
     return this.mediaService.getPresignedUploadUrl(dto);
   }
 
+  @Get('presigned-get-url')
+  async getPresignedGetUrl(@Query('key') key: string) {
+    if (!key) {
+      throw new BadRequestException('key query parameter is required.');
+    }
+    const signedUrl = await this.mediaService.getPresignedDownloadUrl(key);
+    return { signedUrl, key };
+  }
+
+  @Post('sync')
+  async syncMedia() {
+    await this.mediaService.syncPredefinedMedia();
+    return { success: true, message: 'Media synchronized with R2 storage' };
+  }
+
   @Post('confirm')
   async confirmUpload(@Body() dto: ConfirmMediaUploadDto) {
     if (!dto.key || !dto.url) {

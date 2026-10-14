@@ -19,6 +19,19 @@ export class AuthController {
     return this.authService.getMe(user.id);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Post('change-password')
+  async changePassword(
+    @CurrentUser() user: any,
+    @Body() body: { oldPassword?: string; newPassword?: string },
+  ) {
+    return this.authService.changePassword(
+      user.id,
+      body.oldPassword || '',
+      body.newPassword || '',
+    );
+  }
+
   @Post('reset-admin')
   async resetAdmin() {
     return this.authService.resetAdmin();
