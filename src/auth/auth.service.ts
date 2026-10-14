@@ -13,19 +13,37 @@ export class AuthService implements OnModuleInit {
 
   async onModuleInit() {
     try {
-      const userCount = await this.prisma.user.count();
-      if (userCount === 0) {
-        const defaultPasswordHash = bcrypt.hashSync('AdminOptimark2026!', 10);
-        await this.prisma.user.create({
-          data: {
-            email: 'admin@optimark.ai',
-            name: 'Admin Optimark',
-            role: 'ADMIN',
-            passwordHash: defaultPasswordHash,
-          },
-        });
-        console.log('✅ Auto-seeded root admin account: admin@optimark.ai');
-      }
+      await this.prisma.$executeRawUnsafe(`
+        CREATE TABLE IF NOT EXISTS cms_users (
+          id TEXT PRIMARY KEY,
+          email TEXT UNIQUE NOT NULL,
+          password_hash TEXT NOT NULL,
+          name TEXT NOT NULL,
+          role TEXT NOT NULL DEFAULT 'EDITOR',
+          person_id TEXT UNIQUE REFERENCES cms_people(id) ON DELETE SET NULL,
+          created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+          updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+        );
+      `);
+      const hash = bcrypt.hashSync('AdminOptimark2026!', 10);
+      await this.prisma.$executeRawUnsafe(`
+        INSERT INTO cms_users (id, email, password_hash, name, role)
+        VALUES ('admin-init-id', 'admin@optimark.ai', '${hash}', 'Admin Optimark', 'ADMIN')
+        ON CONFLICT (email) DO UPDATE SET password_hash = '${hash}';
+      `);
+      await this.prisma.$executeRawUnsafe(`
+        INSERT INTO cms_users (id, email, password_hash, name, role, person_id)
+        SELECT 'rafi-init-id', 'rafi@optimark.ai', '${hash}', 'Rafi Rizky', 'AUTHOR', id
+        FROM cms_people WHERE slug = 'rafi-rizky'
+        ON CONFLICT (email) DO NOTHING;
+      `);
+      await this.prisma.$executeRawUnsafe(`
+        INSERT INTO cms_users (id, email, password_hash, name, role, person_id)
+        SELECT 'thia-init-id', 'thia@optimark.ai', '${hash}', 'Thia Rahmani', 'AUTHOR', id
+        FROM cms_people WHERE slug = 'thia-rahmani'
+        ON CONFLICT (email) DO NOTHING;
+      `);
+      console.log('✅ Auto-created table cms_users & root accounts');
     } catch (err: any) {
       console.warn('⚠️ Auto-seed admin notice:', err.message);
     }
