@@ -7,6 +7,7 @@ FROM base AS deps
 WORKDIR /app
 COPY package.json pnpm-lock.yaml ./
 COPY prisma ./prisma
+RUN pnpm config set enable-pre-post-scripts true
 RUN pnpm install --frozen-lockfile
 RUN pnpm prisma generate
 
