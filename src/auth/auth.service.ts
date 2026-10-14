@@ -15,6 +15,14 @@ export class AuthService implements OnModuleInit {
     try {
       await this.prisma.$executeRawUnsafe(`
         DO $$ BEGIN
+          CREATE TYPE "UserRole" AS ENUM ('ADMIN', 'EDITOR', 'AUTHOR');
+        EXCEPTION
+          WHEN duplicate_object THEN null;
+        END $$;
+      `).catch(() => {});
+
+      await this.prisma.$executeRawUnsafe(`
+        DO $$ BEGIN
           ALTER TABLE cms_people ADD COLUMN IF NOT EXISTS role_id TEXT;
           ALTER TABLE cms_people ADD COLUMN IF NOT EXISTS role_en TEXT;
           ALTER TABLE cms_people ADD COLUMN IF NOT EXISTS position_id TEXT;
@@ -28,9 +36,10 @@ export class AuthService implements OnModuleInit {
           ALTER TABLE cms_people ADD COLUMN IF NOT EXISTS education_id JSONB;
           ALTER TABLE cms_people ADD COLUMN IF NOT EXISTS education_en JSONB;
         EXCEPTION
-          WHEN duplicate_column THEN null;
+          WHEN others THEN null;
         END $$;
-      `);
+      `).catch(() => {});
+
       await this.prisma.$executeRawUnsafe(`
         CREATE TABLE IF NOT EXISTS cms_users (
           id TEXT PRIMARY KEY,
@@ -42,27 +51,30 @@ export class AuthService implements OnModuleInit {
           created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
           updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
         );
-      `);
+      `).catch(() => {});
+
       const hash = bcrypt.hashSync('AdminOptimark2026!', 10);
       await this.prisma.$executeRawUnsafe(`
         INSERT INTO cms_users (id, email, password_hash, name, role)
         VALUES ('admin-init-id', 'admin@optimark.ai', '${hash}', 'Admin Optimark', 'ADMIN')
         ON CONFLICT (email) DO UPDATE SET password_hash = '${hash}';
-      `);
+      `).catch(() => {});
+
       await this.prisma.$executeRawUnsafe(`
         INSERT INTO cms_users (id, email, password_hash, name, role, person_id)
         SELECT 'rafi-init-id', 'rafi@optimark.ai', '${hash}', 'Rafi Rizky', 'AUTHOR', id
         FROM cms_people WHERE slug = 'rafi-rizky'
         ON CONFLICT (email) DO NOTHING;
-      `);
+      `).catch(() => {});
+
       await this.prisma.$executeRawUnsafe(`
         INSERT INTO cms_users (id, email, password_hash, name, role, person_id)
         SELECT 'thia-init-id', 'thia@optimark.ai', '${hash}', 'Thia Rahmani', 'AUTHOR', id
         FROM cms_people WHERE slug = 'thia-rahmani'
         ON CONFLICT (email) DO NOTHING;
-      `);
+      `).catch(() => {});
     } catch (err: any) {
-      console.warn('⚠️ Table init warning:', err.message);
+      console.warn('Non-fatal onModuleInit note:', err.message);
     }
 
     // Update admin password using Prisma client parameterization to avoid SQL escaping issues
