@@ -4,6 +4,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { PrismaClient } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
+import bcrypt from 'bcryptjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -130,9 +131,23 @@ function markdownToBlocks(markdown) {
 }
 
 async function main() {
-  console.log('🌱 [Manual Seed] Starting production seed with bilingual ID & EN articles...');
+  console.log('🌱 Starting database seeding...');
 
-  const raw = fs.readFileSync(path.join(__dirname, 'production-seed.json'), 'utf-8');
+  // Auto-migrate any legacy optimark.ai URLs to Cloudflare R2 staging
+  try {
+    const r2Base = 'https://optimark-staging-media.dritech.co.id/optimark/blog/';
+    await prisma.$executeRawUnsafe(`
+      UPDATE articles SET "coverImageUrl" = REPLACE("coverImageUrl", 'https://optimark.ai/images/blog/', '${r2Base}') WHERE "coverImageUrl" LIKE '%optimark.ai%';
+    `);
+    await prisma.$executeRawUnsafe(`
+      UPDATE people SET "avatarUrl" = REPLACE("avatarUrl", 'https://optimark.ai/images/blog/', '${r2Base}') WHERE "avatarUrl" LIKE '%optimark.ai%';
+    `);
+    console.log('🖼️ Legacy optimark.ai images migrated to Cloudflare R2 staging.');
+  } catch (err) {
+    console.warn('Image migration notice:', err.message);
+  }
+
+  // 1. Seed or Upsert Categories
   const { categories, people, articles } = JSON.parse(raw);
 
   // 1. Categories
@@ -171,6 +186,60 @@ async function main() {
     personMap.set(p.slug, record.id);
   }
   console.log(`✅ People (E-E-A-T) seeded: ${personMap.size} profiles`);
+
+  // 2.5 Seed Initial Users (Admin & Authors)
+  const defaultPasswordHash = bcrypt.hashSync('Asdqwe123!', 10);
+  const usersToSeed = [
+    {
+      email: 'admin@optimark.ai',
+      name: 'Admin Optimark',
+      role: 'ADMIN',
+      personId: null,
+    },
+    {
+      email: 'admin@dritech.co.id',
+      name: 'Admin Dritech',
+      role: 'ADMIN',
+      personId: null,
+    },
+    {
+      email: 'rafi@optimark.ai',
+      name: 'Rafi Rizky',
+      role: 'AUTHOR',
+      personId: personMap.get('rafi-rizky') || null,
+    },
+    {
+      email: 'thia@optimark.ai',
+      name: 'Thia Rahmani',
+      role: 'AUTHOR',
+      personId: personMap.get('thia-rahmani') || null,
+    },
+    {
+      email: 'jonathan@optimark.ai',
+      name: 'Jonathan Anderson T.',
+      role: 'EDITOR',
+      personId: personMap.get('jonathan-anderson') || null,
+    },
+  ];
+
+  for (const u of usersToSeed) {
+    await prisma.user.upsert({
+      where: { email: u.email },
+      update: {
+        name: u.name,
+        role: u.role,
+        personId: u.personId,
+      },
+      create: {
+        email: u.email,
+        name: u.name,
+        role: u.role,
+        personId: u.personId,
+        passwordHash: defaultPasswordHash,
+      },
+    });
+  }
+  console.log(`✅ Users seeded: ${usersToSeed.length} accounts configured`);
 
   // 3. Articles + Translations (optimark_cms)
   let createdCount = 0;

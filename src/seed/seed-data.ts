@@ -85,7 +85,7 @@ export const SEED_PEOPLE: SeedPerson[] = [
     "name": "Jonathan Anderson T.",
     "role": "SEO Lead & Editorial Reviewer",
     "bio": "Jonathan Anderson adalah SEO Lead dan Editorial Reviewer di Optimark yang berfokus pada strategi SEO, content strategy, dan perkembangan AI-driven search. Ia memiliki pengalaman dalam mengembangkan strategi organic search, technical SEO, content marketing, serta optimasi konten untuk meningkatkan visibilitas dan relevansi website di mesin pencari.\n\nSebagai Editorial Reviewer, ia bertanggung jawab meninjau dan mengevaluasi konten Optimark sebelum dipublikasikan.",
-    "avatarUrl": "https://optimark.ai/images/blog/people/jonathan-anderson.jpg",
+    "avatarUrl": "https://optimark-staging-media.dritech.co.id/optimark/blog/people/jonathan-anderson.jpg",
     "linkedinUrl": "https://www.linkedin.com/in/jonathan-anderson-tjitrabudi",
     "type": "REVIEWER"
   },
@@ -94,7 +94,7 @@ export const SEED_PEOPLE: SeedPerson[] = [
     "name": "Rafi Rizky",
     "role": "SEO & Content Marketing Specialist",
     "bio": "Rafi Rizky adalah digital marketing specialist yang berfokus pada SEO dan Content Marketing. Ia memiliki pengalaman dalam mengembangkan strategi konten berbasis search intent, optimasi SEO, serta pembuatan konten yang informatif dan relevan bagi audiens.",
-    "avatarUrl": "https://optimark.ai/images/blog/people/rafi-rizky.jpg",
+    "avatarUrl": "https://optimark-staging-media.dritech.co.id/optimark/blog/people/rafi-rizky.jpg",
     "linkedinUrl": "https://www.linkedin.com/in/rafirizky",
     "type": "AUTHOR"
   },
@@ -103,7 +103,7 @@ export const SEED_PEOPLE: SeedPerson[] = [
     "name": "Thia Rahmani",
     "role": "Social Media & Visual Content Specialist",
     "bio": "Thia Rahmani adalah digital marketing specialist yang berfokus pada Social Media Marketing dan Visual Content. Ia memiliki pengalaman dalam mengembangkan ide konten, menyusun strategi media sosial, serta membuat materi visual yang relevan dengan kebutuhan brand dan audiens.",
-    "avatarUrl": "https://optimark.ai/images/blog/people/thia-rahmani.jpg",
+    "avatarUrl": "https://optimark-staging-media.dritech.co.id/optimark/blog/people/thia-rahmani.jpg",
     "linkedinUrl": "https://www.linkedin.com/in/thiarahmani",
     "type": "AUTHOR"
   }
@@ -116,7 +116,7 @@ export const SEED_ARTICLES: SeedArticle[] = [
     "publishedAt": "2026-10-01T00:00:00.000Z",
     "contentUpdatedAt": "2026-10-02T00:00:00.000Z",
     "readMinutes": 6,
-    "coverImageUrl": "https://optimark.ai/images/blog/riset-keyword-bisnis-lokal.jpg",
+    "coverImageUrl": "https://optimark-staging-media.dritech.co.id/optimark/blog/riset-keyword-bisnis-lokal.jpg",
     "tags": [
       "riset-keyword",
       "seo-lokal",
@@ -156,7 +156,7 @@ export const SEED_ARTICLES: SeedArticle[] = [
     "publishedAt": "2026-09-29T00:00:00.000Z",
     "contentUpdatedAt": null,
     "readMinutes": 4,
-    "coverImageUrl": "https://optimark.ai/images/blog/jadwal-posting-instagram-umkm-kuliner.jpg",
+    "coverImageUrl": "https://optimark-staging-media.dritech.co.id/optimark/blog/jadwal-posting-instagram-umkm-kuliner.jpg",
     "tags": [
       "instagram",
       "umkm-kuliner",
@@ -195,7 +195,7 @@ export const SEED_ARTICLES: SeedArticle[] = [
     "publishedAt": "2026-09-26T00:00:00.000Z",
     "contentUpdatedAt": null,
     "readMinutes": 5,
-    "coverImageUrl": "https://optimark.ai/images/blog/foto-produk-ai-smartphone.jpg",
+    "coverImageUrl": "https://optimark-staging-media.dritech.co.id/optimark/blog/foto-produk-ai-smartphone.jpg",
     "tags": [
       "foto-produk",
       "ai",
@@ -234,7 +234,7 @@ export const SEED_ARTICLES: SeedArticle[] = [
     "publishedAt": "2026-09-23T00:00:00.000Z",
     "contentUpdatedAt": null,
     "readMinutes": 7,
-    "coverImageUrl": "https://optimark.ai/images/blog/strategi-content-pillar.jpg",
+    "coverImageUrl": "https://optimark-staging-media.dritech.co.id/optimark/blog/strategi-content-pillar.jpg",
     "tags": [
       "content-pillar",
       "konsistensi",
@@ -273,7 +273,7 @@ export const SEED_ARTICLES: SeedArticle[] = [
     "publishedAt": "2026-09-19T00:00:00.000Z",
     "contentUpdatedAt": null,
     "readMinutes": 8,
-    "coverImageUrl": "https://optimark.ai/images/blog/website-belum-muncul-di-google.jpg",
+    "coverImageUrl": "https://optimark-staging-media.dritech.co.id/optimark/blog/website-belum-muncul-di-google.jpg",
     "tags": [
       "seo",
       "google-search-console",
@@ -312,7 +312,7 @@ export const SEED_ARTICLES: SeedArticle[] = [
     "publishedAt": "2026-09-16T00:00:00.000Z",
     "contentUpdatedAt": null,
     "readMinutes": 4,
-    "coverImageUrl": "https://optimark.ai/images/blog/warna-feed-instagram.jpg",
+    "coverImageUrl": "https://optimark-staging-media.dritech.co.id/optimark/blog/warna-feed-instagram.jpg",
     "tags": [
       "instagram",
       "branding",
@@ -351,7 +351,7 @@ export const SEED_ARTICLES: SeedArticle[] = [
     "publishedAt": "2026-09-12T00:00:00.000Z",
     "contentUpdatedAt": null,
     "readMinutes": 3,
-    "coverImageUrl": "https://optimark.ai/images/blog/caption-tiktok.jpg",
+    "coverImageUrl": "https://optimark-staging-media.dritech.co.id/optimark/blog/caption-tiktok.jpg",
     "tags": [
       "tiktok",
       "caption",
@@ -390,7 +390,7 @@ export const SEED_ARTICLES: SeedArticle[] = [
     "publishedAt": "2026-09-09T00:00:00.000Z",
     "contentUpdatedAt": null,
     "readMinutes": 7,
-    "coverImageUrl": "https://optimark.ai/images/blog/artikel-jadi-konten-media-sosial.jpg",
+    "coverImageUrl": "https://optimark-staging-media.dritech.co.id/optimark/blog/artikel-jadi-konten-media-sosial.jpg",
     "tags": [
       "repurpose-konten",
       "media-sosial",
@@ -429,7 +429,7 @@ export const SEED_ARTICLES: SeedArticle[] = [
     "publishedAt": "2026-09-02T00:00:00.000Z",
     "contentUpdatedAt": null,
     "readMinutes": 5,
-    "coverImageUrl": "https://optimark.ai/images/blog/video-promosi-singkat.jpg",
+    "coverImageUrl": "https://optimark-staging-media.dritech.co.id/optimark/blog/video-promosi-singkat.jpg",
     "tags": [
       "video",
       "promosi",
@@ -468,7 +468,7 @@ export const SEED_ARTICLES: SeedArticle[] = [
     "publishedAt": "2026-08-28T00:00:00.000Z",
     "contentUpdatedAt": null,
     "readMinutes": 4,
-    "coverImageUrl": "https://optimark.ai/images/blog/target-audiens.jpg",
+    "coverImageUrl": "https://optimark-staging-media.dritech.co.id/optimark/blog/target-audiens.jpg",
     "tags": [
       "target-audiens",
       "bisnis-online",
@@ -507,7 +507,7 @@ export const SEED_ARTICLES: SeedArticle[] = [
     "publishedAt": "2026-08-25T00:00:00.000Z",
     "contentUpdatedAt": null,
     "readMinutes": 6,
-    "coverImageUrl": "https://optimark.ai/images/blog/insight-instagram.jpg",
+    "coverImageUrl": "https://optimark-staging-media.dritech.co.id/optimark/blog/insight-instagram.jpg",
     "tags": [
       "instagram-insight",
       "analitik",

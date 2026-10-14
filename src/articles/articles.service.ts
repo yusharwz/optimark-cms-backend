@@ -174,7 +174,7 @@ export class ArticlesService {
   }
 
   async findAll(query: QueryArticleDto) {
-    const { search, status, categoryId, authorId, page = 1, limit = 20 } = query;
+    const { search, status, categoryId, authorId, page = 1, limit = 25 } = query;
     const skip = (page - 1) * limit;
 
     const where: Prisma.ArticleWhereInput = {
@@ -238,6 +238,31 @@ export class ArticlesService {
   async update(id: string, dto: UpdateArticleDto) {
     const current = await this.findById(id);
 
+    if (dto.saveAsRevision && current.status === ArticleStatus.PUBLISHED) {
+      const draftPayload = {
+        title: dto.title ?? current.title,
+        slug: dto.slug ?? current.slug,
+        excerpt: dto.excerpt ?? current.excerpt,
+        content: dto.content ?? current.content,
+        metaTitle: dto.metaTitle ?? current.metaTitle,
+        metaDescription: dto.metaDescription ?? current.metaDescription,
+        canonicalUrl: dto.canonicalUrl ?? current.canonicalUrl,
+        coverImageUrl: dto.coverImageUrl ?? current.coverImageUrl,
+        coverImageAlt: dto.coverImageAlt ?? current.coverImageAlt,
+        tags: dto.tags ?? current.tags,
+        categoryId: dto.categoryId ?? current.categoryId,
+        authorId: dto.authorId ?? current.authorId,
+        reviewerId: dto.reviewerId ?? current.reviewerId,
+        translations: dto.translations,
+        updatedAt: new Date().toISOString(),
+      };
+
+      await this.repository.update(id, {
+        draftData: draftPayload as unknown as Prisma.InputJsonValue,
+      });
+      return this.findById(id);
+    }
+
     let slug = current.slug;
     const oldSlug = current.slug;
     if (dto.slug && dto.slug !== current.slug) {
@@ -280,6 +305,7 @@ export class ArticlesService {
       status,
       ...(dto.featured !== undefined ? { featured: dto.featured } : {}),
       tableOfContents: toc as unknown as Prisma.InputJsonValue,
+      draftData: Prisma.DbNull,
       publishedAt,
       scheduledAt,
       contentUpdatedAt: new Date(),

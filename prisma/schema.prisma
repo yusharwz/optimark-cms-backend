@@ -28,6 +28,26 @@ enum CommentStatus {
   REJECTED
 }
 
+enum UserRole {
+  ADMIN
+  EDITOR
+  AUTHOR
+}
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  passwordHash String    @map("password_hash")
+  name         String
+  role         UserRole  @default(EDITOR)
+  personId     String?   @unique @map("person_id")
+  person       Person?   @relation(fields: [personId], references: [id], onDelete: SetNull)
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  @@map("cms_users")
+}
+
 model Category {
   id          String    @id @default(cuid())
   name        String
@@ -56,6 +76,7 @@ model Person {
 
   authoredArticles Article[] @relation("ArticleAuthor")
   reviewedArticles Article[] @relation("ArticleReviewer")
+  user             User?
 
   @@map("cms_people")
 }
@@ -76,6 +97,7 @@ model Article {
   status           ArticleStatus @default(DRAFT)
   featured         Boolean       @default(false)
   tableOfContents  Json?         @map("table_of_contents") // Array of { id, level, text }
+  draftData        Json?         @map("draft_data") // Stored draft revision for published articles
   previewToken     String        @unique @default(uuid()) @map("preview_token")
 
   publishedAt      DateTime?     @map("published_at")

@@ -100,4 +100,11 @@ export class UpdateArticleDto {
   @IsInt()
   @IsOptional()
   readMinutes?: number;
+
+  @IsOptional()
+  draftData?: any;
+
+  @IsBoolean()
+  @IsOptional()
+  saveAsRevision?: boolean;
 }

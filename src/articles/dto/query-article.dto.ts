@@ -22,7 +22,7 @@ export class QueryArticleDto {
   @IsOptional()
   @Type(() => Number)
   @IsInt()
-  limit?: number = 20;
+  limit?: number = 25;
 
   @IsOptional()
   @Type(() => Number)
