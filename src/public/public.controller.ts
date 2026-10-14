@@ -55,6 +55,16 @@ export class PublicController {
     return this.publicService.getAuthorProfile(slug);
   }
 
+  @Get('categories')
+  getCategories() {
+    return this.publicService.getCategories();
+  }
+
+  @Get('categories/:slug')
+  getCategoryBySlug(@Param('slug') slug: string) {
+    return this.publicService.getCategoryBySlug(slug);
+  }
+
   @Get('redirects')
   getRedirects() {
     return this.publicService.getActiveRedirects();

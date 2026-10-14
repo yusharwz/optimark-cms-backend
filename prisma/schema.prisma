@@ -49,13 +49,21 @@ model User {
 }
 
 model Category {
-  id          String    @id @default(cuid())
-  name        String
-  slug        String    @unique
-  description String?
-  sortOrder   Int       @default(0) @map("sort_order")
-  createdAt   DateTime  @default(now()) @map("created_at")
-  updatedAt   DateTime  @updatedAt @map("updated_at")
+  id                String    @id @default(cuid())
+  name              String
+  nameId            String?   @map("name_id")
+  nameEn            String?   @map("name_en")
+  slug              String    @unique
+  description       String?
+  descriptionId     String?   @map("description_id")
+  descriptionEn     String?   @map("description_en")
+  metaTitleId       String?   @map("meta_title_id")
+  metaTitleEn       String?   @map("meta_title_en")
+  metaDescriptionId String?   @map("meta_description_id")
+  metaDescriptionEn String?   @map("meta_description_en")
+  sortOrder         Int       @default(0) @map("sort_order")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
 
   articles    Article[]
 

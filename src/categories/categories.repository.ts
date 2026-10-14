@@ -11,8 +11,16 @@ export class CategoriesRepository {
     return this.prisma.category.create({
       data: {
         name: data.name,
+        nameId: data.nameId || data.name,
+        nameEn: data.nameEn,
         slug: data.slug,
         description: data.description,
+        descriptionId: data.descriptionId || data.description,
+        descriptionEn: data.descriptionEn,
+        metaTitleId: data.metaTitleId,
+        metaTitleEn: data.metaTitleEn,
+        metaDescriptionId: data.metaDescriptionId,
+        metaDescriptionEn: data.metaDescriptionEn,
         sortOrder: data.sortOrder ?? 0,
       },
     });
@@ -43,6 +51,11 @@ export class CategoriesRepository {
   async findBySlug(slug: string) {
     return this.prisma.category.findUnique({
       where: { slug },
+      include: {
+        _count: {
+          select: { articles: true },
+        },
+      },
     });
   }
 

@@ -182,6 +182,32 @@ export class PublicService {
     return person;
   }
 
+  async getCategories() {
+    return this.prisma.category.findMany({
+      orderBy: { sortOrder: 'asc' },
+      include: {
+        _count: {
+          select: { articles: true },
+        },
+      },
+    });
+  }
+
+  async getCategoryBySlug(slug: string) {
+    const category = await this.prisma.category.findUnique({
+      where: { slug },
+      include: {
+        _count: {
+          select: { articles: true },
+        },
+      },
+    });
+    if (!category) {
+      throw new NotFoundException(`Category '${slug}' not found`);
+    }
+    return category;
+  }
+
   async getActiveRedirects() {
     return this.prisma.redirect.findMany({
       where: { active: true },

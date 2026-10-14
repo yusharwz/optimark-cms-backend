@@ -41,6 +41,21 @@ export class AuthService implements OnModuleInit {
       `).catch(() => {});
 
       await this.prisma.$executeRawUnsafe(`
+        DO $$ BEGIN
+          ALTER TABLE cms_categories ADD COLUMN IF NOT EXISTS name_id TEXT;
+          ALTER TABLE cms_categories ADD COLUMN IF NOT EXISTS name_en TEXT;
+          ALTER TABLE cms_categories ADD COLUMN IF NOT EXISTS description_id TEXT;
+          ALTER TABLE cms_categories ADD COLUMN IF NOT EXISTS description_en TEXT;
+          ALTER TABLE cms_categories ADD COLUMN IF NOT EXISTS meta_title_id TEXT;
+          ALTER TABLE cms_categories ADD COLUMN IF NOT EXISTS meta_title_en TEXT;
+          ALTER TABLE cms_categories ADD COLUMN IF NOT EXISTS meta_description_id TEXT;
+          ALTER TABLE cms_categories ADD COLUMN IF NOT EXISTS meta_description_en TEXT;
+        EXCEPTION
+          WHEN others THEN null;
+        END $$;
+      `).catch(() => {});
+
+      await this.prisma.$executeRawUnsafe(`
         CREATE TABLE IF NOT EXISTS cms_users (
           id TEXT PRIMARY KEY,
           email TEXT UNIQUE NOT NULL,

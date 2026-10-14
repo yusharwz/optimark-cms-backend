@@ -6,7 +6,15 @@
 export interface SeedCategory {
   slug: string;
   name: string;
+  nameId?: string;
+  nameEn?: string;
   description: string;
+  descriptionId?: string;
+  descriptionEn?: string;
+  metaTitleId?: string;
+  metaTitleEn?: string;
+  metaDescriptionId?: string;
+  metaDescriptionEn?: string;
   sortOrder: number;
 }
 
@@ -14,7 +22,19 @@ export interface SeedPerson {
   slug: string;
   name: string;
   role: string;
+  roleId?: string;
+  roleEn?: string;
+  positionId?: string;
+  positionEn?: string;
   bio: string;
+  bioId?: string;
+  bioEn?: string;
+  expertiseId?: string[];
+  expertiseEn?: string[];
+  experienceId?: Array<{ title: string; org: string; period: string; logo?: string }>;
+  experienceEn?: Array<{ title: string; org: string; period: string; logo?: string }>;
+  educationId?: Array<{ title: string; org: string; period: string; logo?: string }>;
+  educationEn?: Array<{ title: string; org: string; period: string; logo?: string }>;
   avatarUrl: string;
   linkedinUrl: string;
   type: "AUTHOR" | "REVIEWER" | "BOTH";
@@ -54,59 +74,277 @@ export interface SeedArticle {
 
 export const SEED_CATEGORIES: SeedCategory[] = [
   {
-    "slug": "seo",
-    "name": "SEO",
-    "description": "Strategi optimasi mesin pencari organik, indexing, dan riset keyword",
-    "sortOrder": 1
+    slug: "seo",
+    name: "SEO",
+    nameId: "SEO",
+    nameEn: "SEO",
+    description: "Strategi optimasi mesin pencari organik, indexing, dan riset keyword",
+    descriptionId: "Panduan praktis optimasi mesin pencari untuk bisnis lokal dan UMKM — mulai dari riset keyword, indexing Google, hingga strategi konten yang mendatangkan calon pelanggan organik.",
+    descriptionEn: "Practical search engine optimization guides for local businesses and SMBs — from keyword research and Google indexing to organic traffic strategies.",
+    metaTitleId: "Artikel & Panduan SEO | Optimark",
+    metaTitleEn: "SEO Articles & Guides | Optimark",
+    metaDescriptionId: "Kumpulan panduan praktis SEO, riset keyword, dan optimasi Google Search Console untuk bisnis kecil dan UMKM.",
+    metaDescriptionEn: "Practical SEO guides, keyword research, and Google Search Console optimization for small businesses.",
+    sortOrder: 1,
   },
   {
-    "slug": "content-marketing",
-    "name": "Content Marketing",
-    "description": "Strategi pembuatan konten digital, pilar konten, dan repurpose artikel",
-    "sortOrder": 2
+    slug: "content-marketing",
+    name: "Content Marketing",
+    nameId: "Content Marketing",
+    nameEn: "Content Marketing",
+    description: "Strategi pembuatan konten digital, pilar konten, dan repurpose artikel",
+    descriptionId: "Pelajari cara menyusun strategi konten yang konsisten — mulai dari content pillar, repurpose materi, hingga mendistribusikan pesan brand ke berbagai kanal.",
+    descriptionEn: "Learn how to build consistent content strategies — from content pillars to repurposing and multi-channel brand distribution.",
+    metaTitleId: "Artikel & Panduan Content Marketing | Optimark",
+    metaTitleEn: "Content Marketing Articles & Guides | Optimark",
+    metaDescriptionId: "Panduan content marketing, content pillar, dan strategi repurpose konten untuk memperkuat kehadiran digital bisnis Anda.",
+    metaDescriptionEn: "Content marketing guides, content pillars, and repurposing strategies to strengthen your digital presence.",
+    sortOrder: 2,
   },
   {
-    "slug": "social-media",
-    "name": "Social Media",
-    "description": "Optimasi media sosial Instagram, TikTok, jadwal posting dan engagement",
-    "sortOrder": 3
+    slug: "social-media",
+    name: "Social Media",
+    nameId: "Media Sosial",
+    nameEn: "Social Media",
+    description: "Optimasi media sosial Instagram, TikTok, jadwal posting dan engagement",
+    descriptionId: "Tips mengelola Instagram, TikTok, dan kanal sosial lainnya — dari jadwal posting, penulisan caption yang engaging, hingga membaca insight akun bisnis.",
+    descriptionEn: "Tips for managing Instagram, TikTok, and other channels — from posting schedules and engaging captions to business analytics.",
+    metaTitleId: "Artikel & Panduan Media Sosial | Optimark",
+    metaTitleEn: "Social Media Articles & Guides | Optimark",
+    metaDescriptionId: "Kumpulan tips praktis media sosial untuk UMKM: strategi posting, optimasi caption, dan analisis engagement.",
+    metaDescriptionEn: "Practical social media tips for small businesses: posting strategies, captions, and engagement analysis.",
+    sortOrder: 3,
   },
   {
-    "slug": "visual-content",
-    "name": "Visual Content",
-    "description": "Foto produk AI, estetika feed brand, dan video promosi singkat",
-    "sortOrder": 4
-  }
+    slug: "visual-content",
+    name: "Visual Content",
+    nameId: "Konten Visual",
+    nameEn: "Visual Content",
+    description: "Foto produk AI, estetika feed brand, dan video promosi singkat",
+    descriptionId: "Eksplorasi teknik visual untuk brand kecil: foto produk smartphone berbantuan AI, estetika feed, hingga pembuatan video promosi tanpa tim produksi besar.",
+    descriptionEn: "Explore visual techniques for small brands: AI-assisted smartphone product photography, feed aesthetics, and video production without big crews.",
+    metaTitleId: "Artikel & Panduan Konten Visual | Optimark",
+    metaTitleEn: "Visual Content Articles & Guides | Optimark",
+    metaDescriptionId: "Panduan membuat visual promosi, foto produk AI, dan video pendek menarik dengan modal smartphone untuk bisnis kecil.",
+    metaDescriptionEn: "Guides for creating promotional visuals, AI product photography, and engaging short videos on a smartphone budget.",
+    sortOrder: 4,
+  },
 ];
 
 export const SEED_PEOPLE: SeedPerson[] = [
   {
-    "slug": "jonathan-anderson",
-    "name": "Jonathan Anderson T.",
-    "role": "SEO Lead & Editorial Reviewer",
-    "bio": "Jonathan Anderson adalah SEO Lead dan Editorial Reviewer di Optimark yang berfokus pada strategi SEO, content strategy, dan perkembangan AI-driven search. Ia memiliki pengalaman dalam mengembangkan strategi organic search, technical SEO, content marketing, serta optimasi konten untuk meningkatkan visibilitas dan relevansi website di mesin pencari.\n\nSebagai Editorial Reviewer, ia bertanggung jawab meninjau dan mengevaluasi konten Optimark sebelum dipublikasikan.",
-    "avatarUrl": "https://optimark-staging-media.dritech.co.id/optimark/blog/people/jonathan-anderson.jpg",
-    "linkedinUrl": "https://www.linkedin.com/in/jonathan-anderson-tjitrabudi",
-    "type": "REVIEWER"
+    slug: "jonathan-anderson",
+    name: "Jonathan Anderson T.",
+    role: "SEO Lead & Editorial Reviewer",
+    roleId: "SEO Lead & Editorial Reviewer",
+    roleEn: "SEO Lead & Editorial Reviewer",
+    positionId: "SEO Lead & Editorial Reviewer",
+    positionEn: "SEO Lead & Editorial Reviewer",
+    bio: "Jonathan Anderson adalah SEO Lead dan Editorial Reviewer di Optimark yang berfokus pada strategi SEO, content strategy, dan perkembangan AI-driven search. Ia memiliki pengalaman dalam mengembangkan strategi organic search, technical SEO, content marketing, serta optimasi konten untuk meningkatkan visibilitas dan relevansi website di mesin pencari.\n\nSebagai Editorial Reviewer, ia bertanggung jawab meninjau dan mengevaluasi konten Optimark sebelum dipublikasikan. Proses review mencakup search intent, struktur dan kualitas konten, topical relevance, on-page SEO, serta penerapan strategi AEO dan GEO untuk menyesuaikan konten dengan perkembangan pencarian berbasis AI.\n\nDalam menjalankan perannya, ia menggabungkan pendekatan SEO dengan pemahaman terhadap kebutuhan pengguna dan kualitas informasi. Fokusnya adalah memastikan setiap konten yang diterbitkan Optimark memiliki informasi yang akurat, relevan, terstruktur dengan baik, dan memberikan nilai nyata bagi pembaca.",
+    bioId: "Jonathan Anderson adalah SEO Lead dan Editorial Reviewer di Optimark yang berfokus pada strategi SEO, content strategy, dan perkembangan AI-driven search. Ia memiliki pengalaman dalam mengembangkan strategi organic search, technical SEO, content marketing, serta optimasi konten untuk meningkatkan visibilitas dan relevansi website di mesin pencari.\n\nSebagai Editorial Reviewer, ia bertanggung jawab meninjau dan mengevaluasi konten Optimark sebelum dipublikasikan. Proses review mencakup search intent, struktur dan kualitas konten, topical relevance, on-page SEO, serta penerapan strategi AEO dan GEO untuk menyesuaikan konten dengan perkembangan pencarian berbasis AI.\n\nDalam menjalankan perannya, ia menggabungkan pendekatan SEO dengan pemahaman terhadap kebutuhan pengguna dan kualitas informasi. Fokusnya adalah memastikan setiap konten yang diterbitkan Optimark memiliki informasi yang akurat, relevan, terstruktur dengan baik, dan memberikan nilai nyata bagi pembaca.",
+    bioEn: "Jonathan Anderson is the SEO Lead and Editorial Reviewer at Optimark, focusing on organic search strategy, content architecture, and the evolution of AI-driven search engines (AEO and GEO). With extensive hands-on experience in technical SEO, keyword taxonomy, and content evaluation, he ensures that every guide published meets strict standards for search intent, factual depth, and actionable clarity.",
+    expertiseId: [
+      "SEO",
+      "Technical SEO",
+      "Content Strategy",
+      "Content Marketing",
+      "AEO",
+      "GEO",
+      "AI SEO",
+      "On-Page SEO",
+      "International SEO",
+      "Local SEO",
+      "Digital Marketing",
+    ],
+    expertiseEn: [
+      "SEO",
+      "Technical SEO",
+      "Content Strategy",
+      "Content Marketing",
+      "AEO",
+      "GEO",
+      "AI SEO",
+      "On-Page SEO",
+      "International SEO",
+      "Local SEO",
+      "Digital Marketing",
+    ],
+    experienceId: [
+      {
+        title: "SEO Lead",
+        org: "PT Usaha Kreatif Indonesia",
+        period: "2025 - Saat ini",
+        logo: "https://optimark-staging-media.dritech.co.id/optimark/blog/people/logos/usaha-kreatif.png",
+      },
+      {
+        title: "Digital Client Solutions Manager",
+        org: "PT Sribu Digital Kreatif",
+        period: "2023 - 2025",
+        logo: "https://optimark-staging-media.dritech.co.id/optimark/blog/people/logos/sribu.png",
+      },
+      {
+        title: "SEO Specialist",
+        org: "MNC Group",
+        period: "2021 - 2023",
+        logo: "https://optimark-staging-media.dritech.co.id/optimark/blog/people/logos/mnc-media.png",
+      },
+      {
+        title: "Lead Marketing",
+        org: "PT. Citra Jasa Andalan",
+        period: "2019 - 2020",
+        logo: "https://optimark-staging-media.dritech.co.id/optimark/blog/people/logos/cj-pro.png",
+      },
+    ],
+    experienceEn: [
+      {
+        title: "SEO Lead",
+        org: "PT Usaha Kreatif Indonesia",
+        period: "2025 - Present",
+        logo: "https://optimark-staging-media.dritech.co.id/optimark/blog/people/logos/usaha-kreatif.png",
+      },
+      {
+        title: "Digital Client Solutions Manager",
+        org: "PT Sribu Digital Kreatif",
+        period: "2023 - 2025",
+        logo: "https://optimark-staging-media.dritech.co.id/optimark/blog/people/logos/sribu.png",
+      },
+      {
+        title: "SEO Specialist",
+        org: "MNC Group",
+        period: "2021 - 2023",
+        logo: "https://optimark-staging-media.dritech.co.id/optimark/blog/people/logos/mnc-media.png",
+      },
+      {
+        title: "Lead Marketing",
+        org: "PT. Citra Jasa Andalan",
+        period: "2019 - 2020",
+        logo: "https://optimark-staging-media.dritech.co.id/optimark/blog/people/logos/cj-pro.png",
+      },
+    ],
+    educationId: [
+      {
+        title: "Bachelor’s in Management",
+        org: "Sanata Dharma University",
+        period: "2015 - 2019",
+        logo: "https://optimark-staging-media.dritech.co.id/optimark/blog/people/logos/sanata-dharma.png",
+      },
+      {
+        title: "Digital Marketing (SEO Specialist)",
+        org: "Purwadhika Digital Technology School",
+        period: "",
+        logo: "https://optimark-staging-media.dritech.co.id/optimark/blog/people/logos/purwadhika.png",
+      },
+    ],
+    educationEn: [
+      {
+        title: "Bachelor’s in Management",
+        org: "Sanata Dharma University",
+        period: "2015 - 2019",
+        logo: "https://optimark-staging-media.dritech.co.id/optimark/blog/people/logos/sanata-dharma.png",
+      },
+      {
+        title: "Digital Marketing (SEO Specialist)",
+        org: "Purwadhika Digital Technology School",
+        period: "",
+        logo: "https://optimark-staging-media.dritech.co.id/optimark/blog/people/logos/purwadhika.png",
+      },
+    ],
+    avatarUrl: "https://optimark-staging-media.dritech.co.id/optimark/blog/people/jonathan-anderson.jpg",
+    linkedinUrl: "https://www.linkedin.com/in/jonathan-anderson-tjitrabudi",
+    type: "REVIEWER",
   },
   {
-    "slug": "rafi-rizky",
-    "name": "Rafi Rizky",
-    "role": "SEO & Content Marketing Specialist",
-    "bio": "Rafi Rizky adalah digital marketing specialist yang berfokus pada SEO dan Content Marketing. Ia memiliki pengalaman dalam mengembangkan strategi konten berbasis search intent, optimasi SEO, serta pembuatan konten yang informatif dan relevan bagi audiens.",
-    "avatarUrl": "https://optimark-staging-media.dritech.co.id/optimark/blog/people/rafi-rizky.jpg",
-    "linkedinUrl": "https://www.linkedin.com/in/rafirizky",
-    "type": "AUTHOR"
+    slug: "rafi-rizky",
+    name: "Rafi Rizky",
+    role: "SEO & Content Marketing Specialist",
+    roleId: "SEO & Content Marketing Specialist",
+    roleEn: "SEO & Content Marketing Specialist",
+    positionId: "SEO & Content Marketing Specialist",
+    positionEn: "SEO & Content Marketing Specialist",
+    bio: "Rafi Rizky adalah digital marketing specialist yang berfokus pada SEO dan Content Marketing. Ia memiliki pengalaman dalam mengembangkan strategi konten berbasis search intent, optimasi SEO, serta pembuatan konten yang informatif dan relevan bagi audiens. Di Optimark, Rafi berkontribusi dalam pengembangan konten SEO dan strategi content marketing untuk meningkatkan visibilitas organik serta membangun topical relevance.",
+    bioId: "Rafi Rizky adalah digital marketing specialist yang berfokus pada SEO dan Content Marketing. Ia memiliki pengalaman dalam mengembangkan strategi konten berbasis search intent, optimasi SEO, serta pembuatan konten yang informatif dan relevan bagi audiens. Di Optimark, Rafi berkontribusi dalam pengembangan konten SEO dan strategi content marketing untuk meningkatkan visibilitas organik serta membangun topical relevance.",
+    bioEn: "Rafi Rizky is a digital marketing specialist focusing on SEO and Content Marketing. He has hands-on experience in search intent keyword strategies, technical SEO optimization, and creating highly relevant educational guides. At Optimark, Rafi leads organic content development to establish topical relevance and drive qualified traffic for local businesses.",
+    expertiseId: [
+      "SEO",
+      "Content Marketing",
+      "Keyword Research",
+      "Search Intent",
+      "Content Strategy",
+    ],
+    expertiseEn: [
+      "SEO",
+      "Content Marketing",
+      "Keyword Research",
+      "Search Intent",
+      "Content Strategy",
+    ],
+    experienceId: [
+      {
+        title: "SEO & Content Specialist",
+        org: "Optimark",
+        period: "2024 - Saat ini",
+        logo: "https://optimark-staging-media.dritech.co.id/optimark/blog/people/logos/usaha-kreatif.png",
+      },
+    ],
+    experienceEn: [
+      {
+        title: "SEO & Content Specialist",
+        org: "Optimark",
+        period: "2024 - Present",
+        logo: "https://optimark-staging-media.dritech.co.id/optimark/blog/people/logos/usaha-kreatif.png",
+      },
+    ],
+    educationId: [],
+    educationEn: [],
+    avatarUrl: "https://optimark-staging-media.dritech.co.id/optimark/blog/people/rafi-rizky.jpg",
+    linkedinUrl: "https://www.linkedin.com/in/rafirizky",
+    type: "AUTHOR",
   },
   {
-    "slug": "thia-rahmani",
-    "name": "Thia Rahmani",
-    "role": "Social Media & Visual Content Specialist",
-    "bio": "Thia Rahmani adalah digital marketing specialist yang berfokus pada Social Media Marketing dan Visual Content. Ia memiliki pengalaman dalam mengembangkan ide konten, menyusun strategi media sosial, serta membuat materi visual yang relevan dengan kebutuhan brand dan audiens.",
-    "avatarUrl": "https://optimark-staging-media.dritech.co.id/optimark/blog/people/thia-rahmani.jpg",
-    "linkedinUrl": "https://www.linkedin.com/in/thiarahmani",
-    "type": "AUTHOR"
-  }
+    slug: "thia-rahmani",
+    name: "Thia Rahmani",
+    role: "Social Media & Visual Content Specialist",
+    roleId: "Social Media & Visual Content Specialist",
+    roleEn: "Social Media & Visual Content Specialist",
+    positionId: "Social Media & Visual Content Specialist",
+    positionEn: "Social Media & Visual Content Specialist",
+    bio: "Thia Rahmani adalah digital marketing specialist yang berfokus pada Social Media Marketing dan Visual Content. Ia memiliki pengalaman dalam mengembangkan ide konten, menyusun strategi media sosial, serta membuat materi visual yang relevan dengan kebutuhan brand dan audiens. Di Optimark, Thia berkontribusi dalam pengembangan konten digital, social media, dan visual marketing untuk membantu bisnis menyampaikan pesan secara lebih menarik dan konsisten.",
+    bioId: "Thia Rahmani adalah digital marketing specialist yang berfokus pada Social Media Marketing dan Visual Content. Ia memiliki pengalaman dalam mengembangkan ide konten, menyusun strategi media sosial, serta membuat materi visual yang relevan dengan kebutuhan brand dan audiens. Di Optimark, Thia berkontribusi dalam pengembangan konten digital, social media, dan visual marketing untuk membantu bisnis menyampaikan pesan secara lebih menarik dan konsisten.",
+    bioEn: "Thia Rahmani is a social media and visual content strategist. She specializes in content pillars, cross-platform distribution (Instagram, TikTok), and AI visual creation for emerging brands. At Optimark, Thia designs frameworks that turn complex marketing workflows into visual assets that convert.",
+    expertiseId: [
+      "Social Media Marketing",
+      "Content Planning",
+      "Visual Content",
+      "Digital Marketing",
+    ],
+    expertiseEn: [
+      "Social Media Marketing",
+      "Content Planning",
+      "Visual Content",
+      "Digital Marketing",
+    ],
+    experienceId: [
+      {
+        title: "Social Media Specialist",
+        org: "Optimark",
+        period: "2024 - Saat ini",
+        logo: "https://optimark-staging-media.dritech.co.id/optimark/blog/people/logos/usaha-kreatif.png",
+      },
+    ],
+    experienceEn: [
+      {
+        title: "Social Media Specialist",
+        org: "Optimark",
+        period: "2024 - Present",
+        logo: "https://optimark-staging-media.dritech.co.id/optimark/blog/people/logos/usaha-kreatif.png",
+      },
+    ],
+    educationId: [],
+    educationEn: [],
+    avatarUrl: "https://optimark-staging-media.dritech.co.id/optimark/blog/people/thia-rahmani.jpg",
+    linkedinUrl: "https://www.linkedin.com/in/thiarahmani",
+    type: "AUTHOR",
+  },
 ];
 
 export const SEED_ARTICLES: SeedArticle[] = [
