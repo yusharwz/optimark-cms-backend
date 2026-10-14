@@ -4,9 +4,11 @@ import { Injectable, Logger } from '@nestjs/common';
 export class RevalidationService {
   private readonly logger = new Logger(RevalidationService.name);
   private readonly revalidateUrl =
-    process.env.LANDING_PAGE_REVALIDATE_URL || 'http://localhost:3000/api/revalidate';
+    process.env.LANDING_PAGE_REVALIDATE_URL || 'http://landing-page:3000/api/revalidate';
   private readonly secret =
-    process.env.REVALIDATE_SECRET || 'optimark_cms_revalidate_secret_2026';
+    process.env.REVALIDATE_SECRET ||
+    process.env.LANDING_PAGE_REVALIDATE_SECRET ||
+    'optimark_landing_revalidate_secret_key_2026';
 
   /**
    * Triggers ISR cache revalidation for one or more paths on the landing page.
