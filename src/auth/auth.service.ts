@@ -154,6 +154,40 @@ export class AuthService implements OnModuleInit {
         passwordHash: hash,
       },
     });
+
+    // Also ensure authors exist and are linked to their E-E-A-T Person profiles
+    const rafiPerson = await this.prisma.person.findFirst({ where: { slug: 'rafi-rizky' } });
+    if (rafiPerson) {
+      await this.prisma.user.upsert({
+        where: { email: 'rafi@optimark.ai' },
+        update: { passwordHash: hash, personId: rafiPerson.id },
+        create: {
+          id: 'rafi-author-id',
+          email: 'rafi@optimark.ai',
+          name: 'Rafi Rizky',
+          role: 'AUTHOR',
+          passwordHash: hash,
+          personId: rafiPerson.id,
+        },
+      });
+    }
+
+    const thiaPerson = await this.prisma.person.findFirst({ where: { slug: 'thia-rahmani' } });
+    if (thiaPerson) {
+      await this.prisma.user.upsert({
+        where: { email: 'thia@optimark.ai' },
+        update: { passwordHash: hash, personId: thiaPerson.id },
+        create: {
+          id: 'thia-author-id',
+          email: 'thia@optimark.ai',
+          name: 'Thia Rahmani',
+          role: 'AUTHOR',
+          passwordHash: hash,
+          personId: thiaPerson.id,
+        },
+      });
+    }
+
     return { success: true, email: user.email, name: user.name, role: user.role };
   }
 }
