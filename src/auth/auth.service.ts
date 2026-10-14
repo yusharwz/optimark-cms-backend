@@ -14,12 +14,19 @@ export class AuthService implements OnModuleInit {
   async onModuleInit() {
     try {
       await this.prisma.$executeRawUnsafe(`
+        DO $$ BEGIN
+          CREATE TYPE "UserRole" AS ENUM ('ADMIN', 'EDITOR', 'AUTHOR');
+        EXCEPTION
+          WHEN duplicate_object THEN null;
+        END $$;
+      `);
+      await this.prisma.$executeRawUnsafe(`
         CREATE TABLE IF NOT EXISTS cms_users (
           id TEXT PRIMARY KEY,
           email TEXT UNIQUE NOT NULL,
           password_hash TEXT NOT NULL,
           name TEXT NOT NULL,
-          role TEXT NOT NULL DEFAULT 'EDITOR',
+          role "UserRole" NOT NULL DEFAULT 'EDITOR',
           person_id TEXT UNIQUE REFERENCES cms_people(id) ON DELETE SET NULL,
           created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
           updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
@@ -58,12 +65,12 @@ export class AuthService implements OnModuleInit {
     });
 
     if (!user) {
-      throw new UnauthorizedException('Kredensial login tidak valid');
+      throw new UnauthorizedException(`User tidak ditemukan: ${email}`);
     }
 
     const isMatch = bcrypt.compareSync(pass, user.passwordHash);
     if (!isMatch) {
-      throw new UnauthorizedException('Kredensial login tidak valid');
+      throw new UnauthorizedException('Password tidak cocok');
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
