@@ -26,8 +26,8 @@ async function bootstrap() {
   );
 
   const port = process.env.PORT || 3001;
-  await app.listen(port);
-  logger.log(`🚀 Optimark CMS Backend is running on: http://localhost:${port}/api`);
+  await app.listen(port, '0.0.0.0');
+  logger.log(`🚀 Optimark CMS Backend is running on: http://0.0.0.0:${port}/api`);
 }
 
 void bootstrap();
