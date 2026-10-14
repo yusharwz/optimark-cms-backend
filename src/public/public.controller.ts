@@ -65,6 +65,11 @@ export class PublicController {
     return this.publicService.getCategoryBySlug(slug);
   }
 
+  @Post('sync-seed')
+  syncSeed() {
+    return this.publicService.syncSeed();
+  }
+
   @Get('redirects')
   getRedirects() {
     return this.publicService.getActiveRedirects();

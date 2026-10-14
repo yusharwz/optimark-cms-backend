@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { SEED_CATEGORIES, SEED_PEOPLE } from '../seed/seed-data';
 import { ArticleStatus } from '@prisma/client';
 
 @Injectable()
@@ -206,6 +207,90 @@ export class PublicService {
       throw new NotFoundException(`Category '${slug}' not found`);
     }
     return category;
+  }
+
+  async syncSeed() {
+    for (const cat of SEED_CATEGORIES) {
+      await this.prisma.category.upsert({
+        where: { slug: cat.slug },
+        update: {
+          name: cat.name,
+          nameId: cat.nameId || cat.name,
+          nameEn: cat.nameEn || cat.name,
+          description: cat.description,
+          descriptionId: cat.descriptionId || cat.description,
+          descriptionEn: cat.descriptionEn || cat.description,
+          metaTitleId: cat.metaTitleId,
+          metaTitleEn: cat.metaTitleEn,
+          metaDescriptionId: cat.metaDescriptionId,
+          metaDescriptionEn: cat.metaDescriptionEn,
+          sortOrder: cat.sortOrder,
+        },
+        create: {
+          name: cat.name,
+          nameId: cat.nameId || cat.name,
+          nameEn: cat.nameEn || cat.name,
+          slug: cat.slug,
+          description: cat.description,
+          descriptionId: cat.descriptionId || cat.description,
+          descriptionEn: cat.descriptionEn || cat.description,
+          metaTitleId: cat.metaTitleId,
+          metaTitleEn: cat.metaTitleEn,
+          metaDescriptionId: cat.metaDescriptionId,
+          metaDescriptionEn: cat.metaDescriptionEn,
+          sortOrder: cat.sortOrder,
+        },
+      });
+    }
+
+    for (const p of SEED_PEOPLE) {
+      await this.prisma.person.upsert({
+        where: { slug: p.slug },
+        update: {
+          name: p.name,
+          role: p.role,
+          roleId: p.roleId || p.role,
+          roleEn: p.roleEn || p.role,
+          positionId: p.positionId,
+          positionEn: p.positionEn,
+          bio: p.bio,
+          bioId: p.bioId || p.bio,
+          bioEn: p.bioEn || p.bio,
+          expertiseId: p.expertiseId || [],
+          expertiseEn: p.expertiseEn || [],
+          experienceId: p.experienceId as any,
+          experienceEn: p.experienceEn as any,
+          educationId: p.educationId as any,
+          educationEn: p.educationEn as any,
+          avatarUrl: p.avatarUrl,
+          linkedinUrl: p.linkedinUrl,
+          type: p.type as any,
+        },
+        create: {
+          name: p.name,
+          slug: p.slug,
+          role: p.role,
+          roleId: p.roleId || p.role,
+          roleEn: p.roleEn || p.role,
+          positionId: p.positionId,
+          positionEn: p.positionEn,
+          bio: p.bio,
+          bioId: p.bioId || p.bio,
+          bioEn: p.bioEn || p.bio,
+          expertiseId: p.expertiseId || [],
+          expertiseEn: p.expertiseEn || [],
+          experienceId: p.experienceId as any,
+          experienceEn: p.experienceEn as any,
+          educationId: p.educationId as any,
+          educationEn: p.educationEn as any,
+          avatarUrl: p.avatarUrl,
+          linkedinUrl: p.linkedinUrl,
+          type: p.type as any,
+        },
+      });
+    }
+
+    return { success: true, message: 'Taxonomy and People synchronized with seed data' };
   }
 
   async getActiveRedirects() {
