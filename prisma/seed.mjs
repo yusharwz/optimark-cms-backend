@@ -8,6 +8,8 @@ import bcrypt from 'bcryptjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const seedFilePath = path.join(__dirname, 'production-seed.json');
+const raw = fs.readFileSync(seedFilePath, 'utf8');
 
 const connectionString = process.env.DATABASE_URL;
 if (!connectionString) {
@@ -137,10 +139,10 @@ async function main() {
   try {
     const r2Base = 'https://optimark-staging-media.dritech.co.id/optimark/blog/';
     await prisma.$executeRawUnsafe(`
-      UPDATE articles SET "coverImageUrl" = REPLACE("coverImageUrl", 'https://optimark.ai/images/blog/', '${r2Base}') WHERE "coverImageUrl" LIKE '%optimark.ai%';
+      UPDATE cms_articles SET "cover_image_url" = REPLACE("cover_image_url", 'https://optimark.ai/images/blog/', '${r2Base}') WHERE "cover_image_url" LIKE '%optimark.ai%';
     `);
     await prisma.$executeRawUnsafe(`
-      UPDATE people SET "avatarUrl" = REPLACE("avatarUrl", 'https://optimark.ai/images/blog/', '${r2Base}') WHERE "avatarUrl" LIKE '%optimark.ai%';
+      UPDATE cms_people SET "avatar_url" = REPLACE("avatar_url", 'https://optimark.ai/images/blog/', '${r2Base}') WHERE "avatar_url" LIKE '%optimark.ai%';
     `);
     console.log('🖼️ Legacy optimark.ai images migrated to Cloudflare R2 staging.');
   } catch (err) {
