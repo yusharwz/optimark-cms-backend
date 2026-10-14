@@ -36,7 +36,7 @@ export class RevalidationService {
         });
 
         if (response.ok) {
-          const data = await response.json().catch(() => ({}));
+          await response.json().catch(() => ({}));
           this.logger.log(`✅ [Revalidate] Path '${path}' successfully revalidated.`);
         } else {
           const errorText = await response.text();

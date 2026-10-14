@@ -13,11 +13,28 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { MediaService } from './media.service';
 import { UpdateMediaAltDto } from './dto/update-media-alt.dto';
+import { CreatePresignedUrlDto, ConfirmMediaUploadDto } from './dto/presigned-url.dto';
 import { UploadedFileDto } from './media.interface';
 
 @Controller('media')
 export class MediaController {
   constructor(private readonly mediaService: MediaService) {}
+
+  @Post('presigned-url')
+  async getPresignedUrl(@Body() dto: CreatePresignedUrlDto) {
+    if (!dto.filename || !dto.mimeType) {
+      throw new BadRequestException('filename and mimeType are required.');
+    }
+    return this.mediaService.getPresignedUploadUrl(dto);
+  }
+
+  @Post('confirm')
+  async confirmUpload(@Body() dto: ConfirmMediaUploadDto) {
+    if (!dto.key || !dto.url) {
+      throw new BadRequestException('key and url are required.');
+    }
+    return this.mediaService.confirmUpload(dto);
+  }
 
   @Post('upload')
   @UseInterceptors(FileInterceptor('file'))

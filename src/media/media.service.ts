@@ -2,6 +2,8 @@ import { Injectable, BadRequestException, NotFoundException } from '@nestjs/comm
 import { MediaRepository } from './media.repository';
 import { UploadedFileDto } from './media.interface';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import { CreatePresignedUrlDto, ConfirmMediaUploadDto } from './dto/presigned-url.dto';
 import sharp from 'sharp';
 import path from 'path';
 
@@ -15,8 +17,8 @@ export class MediaService {
     const endpoint = process.env.R2_ENDPOINT;
     const accessKeyId = process.env.R2_ACCESS_KEY;
     const secretAccessKey = process.env.R2_SECRET_KEY;
-    this.bucket = process.env.R2_BUCKET || 'erp';
-    this.publicUrl = (process.env.R2_PUBLIC_URL || 'https://file.usahakreatif.co.id').replace(/\/+$/, '');
+    this.bucket = process.env.R2_BUCKET || 'cms-staging-dokploy';
+    this.publicUrl = (process.env.R2_PUBLIC_URL || 'https://optimark-staging-media.dritech.co.id').replace(/\/+$/, '');
 
     if (!endpoint || !accessKeyId || !secretAccessKey) {
       console.warn('R2 credentials not fully configured in MediaService');
@@ -91,6 +93,43 @@ export class MediaService {
 
   async findAll(limit = 50, offset = 0) {
     return this.repository.findAll(limit, offset);
+  }
+
+  async getPresignedUploadUrl(dto: CreatePresignedUrlDto) {
+    const timestamp = Date.now();
+    const cleanFilename = dto.filename.toLowerCase().replace(/[^a-z0-9.-]/g, '-');
+    const key = `optimark/blog-uploads/${timestamp}-${cleanFilename}`;
+
+    const command = new PutObjectCommand({
+      Bucket: this.bucket,
+      Key: key,
+      ContentType: dto.mimeType,
+    });
+
+    const uploadUrl = await getSignedUrl(this.s3, command, { expiresIn: 3600 });
+    const fileUrl = `${this.publicUrl}/${key}`;
+
+    return {
+      uploadUrl,
+      fileUrl,
+      key,
+      filename: dto.filename,
+      mimeType: dto.mimeType,
+      altText: dto.altText || path.basename(dto.filename, path.extname(dto.filename)),
+    };
+  }
+
+  async confirmUpload(dto: ConfirmMediaUploadDto) {
+    return this.repository.create({
+      url: dto.url,
+      key: dto.key,
+      filename: dto.filename,
+      altText: dto.altText || path.basename(dto.filename, path.extname(dto.filename)),
+      mimeType: dto.mimeType,
+      size: dto.size || 0,
+      width: dto.width,
+      height: dto.height,
+    });
   }
 
   async updateAltText(id: string, altText: string) {

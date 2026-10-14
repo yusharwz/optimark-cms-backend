@@ -144,31 +144,6 @@ async function main() {
       create: cat,
     });
     categoryMap.set(cat.slug, record.id);
-
-    // Ensure category exists in optimark_landing
-    try {
-      await prisma.$executeRawUnsafe(
-        `INSERT INTO optimark_landing.blog_categories (id, slug, sort_order, created_at, updated_at)
-         VALUES ($1, $2, $3, NOW(), NOW())
-         ON CONFLICT (id) DO UPDATE SET slug = EXCLUDED.slug, updated_at = NOW()`,
-        cat.slug,
-        cat.slug,
-        cat.sortOrder || 0
-      );
-      for (const locale of ['id', 'en']) {
-        await prisma.$executeRawUnsafe(
-          `INSERT INTO optimark_landing.blog_category_translations (id, category_id, locale, name)
-           VALUES ($1, $2, $3::"Locale", $4)
-           ON CONFLICT (category_id, locale) DO UPDATE SET name = EXCLUDED.name`,
-          `trans_${cat.slug}_${locale}`,
-          cat.slug,
-          locale,
-          cat.name
-        );
-      }
-    } catch (e) {
-      console.warn(`[CategorySyncWarning] optimark_landing category note for ${cat.slug}:`, e.message);
-    }
   }
   console.log(`✅ Categories seeded: ${categoryMap.size} categories`);
 
@@ -182,47 +157,18 @@ async function main() {
         role: p.role,
         bio: p.bio,
         avatarUrl: p.avatarUrl,
-        linkedinUrl: p.linkedinUrl,
         type: p.type,
       },
       create: {
-        name: p.name,
         slug: p.slug,
+        name: p.name,
         role: p.role,
         bio: p.bio,
         avatarUrl: p.avatarUrl,
-        linkedinUrl: p.linkedinUrl,
         type: p.type,
       },
     });
     personMap.set(p.slug, record.id);
-
-    // Ensure person exists in optimark_landing
-    try {
-      await prisma.$executeRawUnsafe(
-        `INSERT INTO optimark_landing.blog_people (id, slug, name, avatar_url, created_at, updated_at)
-         VALUES ($1, $2, $3, $4, NOW(), NOW())
-         ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name, avatar_url = EXCLUDED.avatar_url, updated_at = NOW()`,
-        p.slug,
-        p.slug,
-        p.name,
-        p.avatarUrl
-      );
-      for (const locale of ['id', 'en']) {
-        await prisma.$executeRawUnsafe(
-          `INSERT INTO optimark_landing.blog_person_translations (id, person_id, locale, role, bio)
-           VALUES ($1, $2, $3::"Locale", $4, $5)
-           ON CONFLICT (person_id, locale) DO UPDATE SET role = EXCLUDED.role`,
-          `trans_${p.slug}_${locale}`,
-          p.slug,
-          locale,
-          p.role,
-          p.bio || `${p.name} adalah kontributor konten Optimark.`
-        );
-      }
-    } catch (e) {
-      console.warn(`[PersonSyncWarning] optimark_landing person note for ${p.slug}:`, e.message);
-    }
   }
   console.log(`✅ People (E-E-A-T) seeded: ${personMap.size} profiles`);
 
@@ -310,94 +256,6 @@ async function main() {
           });
         }
       }
-    }
-
-    // Also sync to optimark_landing.blog_posts & translations
-    try {
-      const postId = `post_${art.slug.replace(/[^a-zA-Z0-9_]/g, '_')}`;
-      const now = new Date();
-
-      await prisma.$executeRawUnsafe(
-        `INSERT INTO optimark_landing.blog_posts (
-          id, external_id, slug, status, category_id, author_id, reviewer_id,
-          cover_image_url, cover_image_alt, read_minutes, featured,
-          published_at, content_updated_at, created_at, updated_at,
-          canonical_url, tags
-        ) VALUES (
-          $1, $2, $3, 'PUBLISHED'::"BlogPostStatus", $4, $5, $6,
-          $7, $8, $9, $10,
-          $11, $12, $13, $14,
-          $15, $16
-        )
-        ON CONFLICT (slug) DO UPDATE SET
-          external_id = EXCLUDED.external_id,
-          status = 'PUBLISHED'::"BlogPostStatus",
-          category_id = EXCLUDED.category_id,
-          author_id = EXCLUDED.author_id,
-          reviewer_id = EXCLUDED.reviewer_id,
-          cover_image_url = EXCLUDED.cover_image_url,
-          cover_image_alt = EXCLUDED.cover_image_alt,
-          read_minutes = EXCLUDED.read_minutes,
-          featured = EXCLUDED.featured,
-          published_at = EXCLUDED.published_at,
-          content_updated_at = EXCLUDED.content_updated_at,
-          updated_at = EXCLUDED.updated_at,
-          canonical_url = EXCLUDED.canonical_url,
-          tags = EXCLUDED.tags`,
-        postId,
-        article.id,
-        art.slug,
-        art.categorySlug,
-        art.authorSlug,
-        art.reviewerSlug || null,
-        art.coverImageUrl,
-        art.coverImageAlt,
-        art.readMinutes,
-        art.featured,
-        new Date(art.publishedAt),
-        art.contentUpdatedAt ? new Date(art.contentUpdatedAt) : now,
-        new Date(art.publishedAt),
-        now,
-        art.canonicalUrl,
-        art.tags,
-      );
-
-      // Translations in optimark_landing
-      for (const locale of ['id', 'en']) {
-        const tr = art.translations?.[locale] || {
-          title: art.title,
-          excerpt: art.excerpt,
-          content: art.content,
-          metaTitle: art.metaTitle,
-          metaDescription: art.metaDescription,
-        };
-        const blocks = markdownToBlocks(tr.content);
-        const bodyJson = JSON.stringify(blocks);
-
-        await prisma.$executeRawUnsafe(
-          `INSERT INTO optimark_landing.blog_post_translations (
-            id, post_id, locale, title, excerpt, meta_title, meta_description, body
-          ) VALUES (
-            $1, $2, $3::"Locale", $4, $5, $6, $7, $8::jsonb
-          )
-          ON CONFLICT (post_id, locale) DO UPDATE SET
-            title = EXCLUDED.title,
-            excerpt = EXCLUDED.excerpt,
-            meta_title = EXCLUDED.meta_title,
-            meta_description = EXCLUDED.meta_description,
-            body = EXCLUDED.body`,
-          `trans_${postId}_${locale}`,
-          postId,
-          locale,
-          tr.title,
-          tr.excerpt || '',
-          tr.metaTitle || tr.title,
-          tr.metaDescription || tr.excerpt || '',
-          bodyJson,
-        );
-      }
-    } catch (landingErr) {
-      console.warn(`[SyncWarning] optimark_landing sync note for '${art.slug}':`, landingErr.message);
     }
 
     createdCount++;

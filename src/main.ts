@@ -30,4 +30,4 @@ async function bootstrap() {
   logger.log(`🚀 Optimark CMS Backend is running on: http://localhost:${port}/api`);
 }
 
-bootstrap();
+void bootstrap();
