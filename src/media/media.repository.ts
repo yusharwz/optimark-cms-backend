@@ -45,6 +45,26 @@ export class MediaRepository {
     });
   }
 
+  async updateAltTextByUrlOrFilename(urlOrFilename: string, altText: string) {
+    const filename = urlOrFilename.split('/').pop()?.split('?')[0] || urlOrFilename;
+    const media = await this.prisma.media.findFirst({
+      where: {
+        OR: [
+          { url: urlOrFilename },
+          { key: { endsWith: filename } },
+          { filename: filename },
+        ],
+      },
+    });
+    if (media) {
+      return this.prisma.media.update({
+        where: { id: media.id },
+        data: { altText },
+      });
+    }
+    return null;
+  }
+
   async delete(id: string) {
     return this.prisma.media.delete({
       where: { id },

@@ -178,6 +178,11 @@ export class ArticlesService {
     }
 
     const fullArticle = await this.findById(created.id);
+    await this.syncMediaAltFromArticle(fullArticle.coverImageUrl, fullArticle.coverImageAlt, [
+      fullArticle.content,
+      dto.translations?.id?.content,
+      dto.translations?.en?.content,
+    ]);
     await this.syncAndRevalidate(fullArticle);
 
     return fullArticle;
@@ -386,6 +391,11 @@ export class ArticlesService {
     }
 
     const fullArticle = await this.findById(id);
+    await this.syncMediaAltFromArticle(fullArticle.coverImageUrl, fullArticle.coverImageAlt, [
+      fullArticle.content,
+      dto.translations?.id?.content,
+      dto.translations?.en?.content,
+    ]);
     await this.syncAndRevalidate(fullArticle);
 
     if (oldSlug !== updated.slug) {
@@ -449,5 +459,54 @@ export class ArticlesService {
     }
 
     return dueArticles.length;
+  }
+
+  private async syncMediaAltFromArticle(
+    coverImageUrl?: string | null,
+    coverImageAlt?: string | null,
+    contents: (string | null | undefined)[] = [],
+  ) {
+    try {
+      if (coverImageUrl && coverImageAlt?.trim()) {
+        await this.updateMediaAltByUrlOrFilename(coverImageUrl, coverImageAlt.trim());
+      }
+
+      for (const content of contents) {
+        if (!content) continue;
+        const matches = content.matchAll(/!\[(.*?)\]\((.*?)\)/g);
+        for (const m of matches) {
+          const alt = m[1]?.trim();
+          const url = m[2]?.trim();
+          if (alt && url) {
+            await this.updateMediaAltByUrlOrFilename(url, alt);
+          }
+        }
+      }
+    } catch (err: any) {
+      this.logger.warn(`[SyncMediaAltFromArticle Notice]: ${err.message}`);
+    }
+  }
+
+  private async updateMediaAltByUrlOrFilename(urlOrFilename: string, altText: string) {
+    try {
+      const filename = urlOrFilename.split('/').pop()?.split('?')[0] || urlOrFilename;
+      const media = await this.prisma.media.findFirst({
+        where: {
+          OR: [
+            { url: urlOrFilename },
+            { key: { endsWith: filename } },
+            { filename },
+          ],
+        },
+      });
+      if (media && media.altText !== altText) {
+        await this.prisma.media.update({
+          where: { id: media.id },
+          data: { altText },
+        });
+      }
+    } catch (err: any) {
+      this.logger.warn(`Failed to auto-sync media alt for ${urlOrFilename}: ${err.message}`);
+    }
   }
 }

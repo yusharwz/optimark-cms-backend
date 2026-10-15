@@ -5,6 +5,7 @@ import { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand } fro
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { CreatePresignedUrlDto, ConfirmMediaUploadDto } from './dto/presigned-url.dto';
 import { PrismaService } from '../prisma/prisma.service';
+import { RevalidationService } from '../revalidation/revalidation.service';
 import sharp from 'sharp';
 import path from 'path';
 
@@ -17,6 +18,7 @@ export class MediaService implements OnModuleInit {
   constructor(
     private readonly repository: MediaRepository,
     private readonly prisma: PrismaService,
+    private readonly revalidationService: RevalidationService,
   ) {
     const endpoint = process.env.R2_ENDPOINT;
     const accessKeyId = process.env.R2_ACCESS_KEY;
@@ -659,6 +661,96 @@ export class MediaService implements OnModuleInit {
     if (!existing) {
       throw new NotFoundException(`Media with ID '${id}' not found.`);
     }
-    return this.repository.updateAltText(id, altText);
+    const cleanAlt = altText.trim();
+    const updated = await this.repository.updateAltText(id, cleanAlt);
+    await this.cascadeAltTextToArticlesAndLanding(existing.url, existing.filename, cleanAlt);
+    return updated;
+  }
+
+  async updateAltByUrlOrFilename(urlOrFilename: string, altText: string) {
+    const cleanAlt = altText.trim();
+    const updated = await this.repository.updateAltTextByUrlOrFilename(urlOrFilename, cleanAlt);
+    if (updated) {
+      await this.cascadeAltTextToArticlesAndLanding(updated.url, updated.filename, cleanAlt);
+    }
+    return updated;
+  }
+
+  async cascadeAltTextToArticlesAndLanding(mediaUrl: string, filename: string, altText: string) {
+    try {
+      const cleanFilename = filename.split('?')[0];
+      const articles = await this.prisma.article.findMany({
+        where: {
+          OR: [
+            { coverImageUrl: { contains: cleanFilename } },
+            { content: { contains: cleanFilename } },
+          ],
+        },
+        include: { translations: true },
+      });
+
+      const transArticles = await this.prisma.articleTranslation.findMany({
+        where: { content: { contains: cleanFilename } },
+        select: { articleId: true },
+      });
+      const allArticleIds = Array.from(
+        new Set([...articles.map((a) => a.id), ...transArticles.map((t) => t.articleId)]),
+      );
+
+      for (const articleId of allArticleIds) {
+        const article = await this.prisma.article.findUnique({
+          where: { id: articleId },
+          include: { translations: true },
+        });
+        if (!article) continue;
+
+        let articleModified = false;
+        let newCoverAlt = article.coverImageAlt;
+        if (article.coverImageUrl?.includes(cleanFilename)) {
+          newCoverAlt = altText;
+          articleModified = true;
+        }
+
+        let newContent = article.content;
+        const imgRegex = new RegExp(`!\\[(.*?)\\]\\(([^)]*${cleanFilename}[^)]*)\\)`, 'g');
+        if (imgRegex.test(newContent)) {
+          newContent = newContent.replace(imgRegex, `![${altText}]($2)`);
+          articleModified = true;
+        }
+
+        if (articleModified) {
+          await this.prisma.article.update({
+            where: { id: article.id },
+            data: {
+              coverImageAlt: newCoverAlt,
+              content: newContent,
+            },
+          });
+        }
+
+        for (const tr of article.translations) {
+          const trRegex = new RegExp(`!\\[(.*?)\\]\\(([^)]*${cleanFilename}[^)]*)\\)`, 'g');
+          if (trRegex.test(tr.content)) {
+            const updatedTrContent = tr.content.replace(trRegex, `![${altText}]($2)`);
+            await this.prisma.articleTranslation.update({
+              where: { id: tr.id },
+              data: { content: updatedTrContent },
+            });
+          }
+        }
+
+        if (article.status === 'PUBLISHED') {
+          await this.revalidationService.revalidateArticle(article.slug);
+          if (article.slugId && article.slugId !== article.slug) {
+            await this.revalidationService.revalidateArticle(article.slugId);
+          }
+          if (article.slugEn && article.slugEn !== article.slug) {
+            await this.revalidationService.revalidateArticle(article.slugEn);
+          }
+        }
+      }
+    } catch (err: any) {
+      console.warn(`[CascadeAltText Notice]: ${err.message}`);
+    }
   }
 }

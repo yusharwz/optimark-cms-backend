@@ -79,6 +79,14 @@ export class MediaController {
     return this.mediaService.findAll(l, o);
   }
 
+  @Patch('sync-alt')
+  async syncAlt(@Body() dto: { urlOrFilename: string; altText: string }) {
+    if (!dto.urlOrFilename || !dto.altText) {
+      throw new BadRequestException('urlOrFilename and altText are required.');
+    }
+    return this.mediaService.updateAltByUrlOrFilename(dto.urlOrFilename, dto.altText);
+  }
+
   @Patch(':id/alt')
   async updateAlt(@Param('id') id: string, @Body() dto: UpdateMediaAltDto) {
     return this.mediaService.updateAltText(id, dto.altText);
