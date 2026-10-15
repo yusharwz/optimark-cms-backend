@@ -7,8 +7,13 @@ describe('MediaService', () => {
       create: vi.fn(),
       findAll: vi.fn(),
     };
+    const mockPrisma: any = {
+      article: { findMany: vi.fn(), update: vi.fn() },
+      person: { findMany: vi.fn(), update: vi.fn() },
+      media: { findMany: vi.fn(), upsert: vi.fn(), count: vi.fn() },
+    };
 
-    const service = new MediaService(mockRepo);
+    const service = new MediaService(mockRepo, mockPrisma);
     const result = await service.getPresignedUploadUrl({
       filename: 'my test image.PNG',
       mimeType: 'image/png',
@@ -16,7 +21,8 @@ describe('MediaService', () => {
       altText: 'Custom Alt',
     });
 
-    expect(result.key).toMatch(/^optimark\/blog-uploads\/\d+-my-test-image\.png$/);
+    expect(result.key).toBe('optimark/blog-uploads/my-test-image.webp');
+    expect(result.filename).toBe('my-test-image.webp');
     expect(result.fileUrl).toContain('optimark-staging-media.dritech.co.id');
     expect(result.uploadUrl).toContain('X-Amz-Algorithm=AWS4-HMAC-SHA256');
     expect(result.altText).toBe('Custom Alt');
@@ -39,8 +45,13 @@ describe('MediaService', () => {
     const mockRepo: any = {
       create: vi.fn().mockResolvedValue(mockCreated),
     };
+    const mockPrisma: any = {
+      article: { findMany: vi.fn(), update: vi.fn() },
+      person: { findMany: vi.fn(), update: vi.fn() },
+      media: { findMany: vi.fn(), upsert: vi.fn(), count: vi.fn() },
+    };
 
-    const service = new MediaService(mockRepo);
+    const service = new MediaService(mockRepo, mockPrisma);
     const saved = await service.confirmUpload({
       key: 'test.png',
       url: 'https://optimark-staging-media.dritech.co.id/test.png',

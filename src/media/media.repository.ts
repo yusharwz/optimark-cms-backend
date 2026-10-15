@@ -17,8 +17,10 @@ export class MediaRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(data: CreateMediaParams) {
-    return this.prisma.media.create({
-      data,
+    return this.prisma.media.upsert({
+      where: { key: data.key },
+      create: data,
+      update: data,
     });
   }
 

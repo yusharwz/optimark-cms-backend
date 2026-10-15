@@ -43,6 +43,12 @@ export class MediaController {
     return { success: true, message: 'Media synchronized with R2 storage' };
   }
 
+  @Post('migrate-webp')
+  async migrateWebp() {
+    const res = await this.mediaService.migrateExistingMediaToWebp();
+    return { success: true, data: res };
+  }
+
   @Post('confirm')
   async confirmUpload(@Body() dto: ConfirmMediaUploadDto) {
     if (!dto.key || !dto.url) {
