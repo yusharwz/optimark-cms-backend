@@ -584,16 +584,24 @@ export class MediaService implements OnModuleInit {
 
             const newUrl = `${this.publicUrl}/${newKey}`;
 
-            await this.prisma.media.update({
-              where: { id: m.id },
-              data: {
-                url: newUrl,
-                key: newKey,
-                filename: newFilename,
-                mimeType: 'image/webp',
-                size: webpBuf.length,
-              },
+            const existingWithUrl = await this.prisma.media.findUnique({
+              where: { url: newUrl },
             });
+
+            if (existingWithUrl && existingWithUrl.id !== m.id) {
+              await this.prisma.media.delete({ where: { id: m.id } });
+            } else {
+              await this.prisma.media.update({
+                where: { id: m.id },
+                data: {
+                  url: newUrl,
+                  key: newKey,
+                  filename: newFilename,
+                  mimeType: 'image/webp',
+                  size: webpBuf.length,
+                },
+              });
+            }
             results.converted++;
           }
         } catch (err: any) {
