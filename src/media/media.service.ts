@@ -74,9 +74,13 @@ export class MediaService implements OnModuleInit {
           const cleanBase = base
             .toLowerCase()
             .trim()
+            .replace(/specialist/g, 'spesialist')
             .replace(/[^\w\s-()]/g, '')
             .replace(/\s+/g, '-')
-            .replace(/-+/g, '-');
+            .replace(/\(-+/g, '(')
+            .replace(/-+\)/g, ')')
+            .replace(/-+/g, '-')
+            .replace(/^-+|-+$/g, '');
           filename = `${cleanBase}.webp`;
         }
       } catch (err) {
@@ -85,7 +89,7 @@ export class MediaService implements OnModuleInit {
     }
 
     const timestamp = Date.now();
-    const cleanFilename = filename.toLowerCase().replace(/[^a-z0-9.-]/g, '-');
+    const cleanFilename = filename.toLowerCase().replace(/[^a-z0-9.()_-]/g, '-');
     const key = `optimark/blog-uploads/${cleanFilename.startsWith('table-') ? `${timestamp}-${cleanFilename}` : cleanFilename}`;
 
     await this.s3.send(
@@ -307,6 +311,15 @@ export class MediaService implements OnModuleInit {
         width: 120,
         height: 120,
       },
+      {
+        key: 'optimark/blog/people/logos/digital-marketing-(seo-spesialist).webp',
+        filename: 'digital-marketing-(seo-spesialist).webp',
+        altText: 'Digital Marketing (SEO Specialist) Logo',
+        mimeType: 'image/webp',
+        size: 3384,
+        width: 120,
+        height: 120,
+      },
     ];
 
     for (const item of predefined) {
@@ -459,59 +472,75 @@ export class MediaService implements OnModuleInit {
           let arrayModified = false;
           const newItems = [];
           for (const item of items) {
-            if (item && item.logo && typeof item.logo === 'string' && !item.logo.endsWith('.webp')) {
-              try {
-                const res = await fetch(item.logo);
-                if (res.ok) {
-                  const arrayBuf = await res.arrayBuffer();
-                  const inputBuf = Buffer.from(arrayBuf);
-                  const webpBuf = await sharp(inputBuf).webp({ quality: 85 }).toBuffer();
-
-                  const baseName = (item.org || item.title || item.degree || 'logo')
-                    .toLowerCase()
-                    .trim()
-                    .replace(/[^\w\s-()]/g, '')
-                    .replace(/\s+/g, '-')
-                    .replace(/-+/g, '-');
-                  const webpKey = `optimark/blog/people/logos/${baseName}.webp`;
-
-                  await this.s3.send(
-                    new PutObjectCommand({
-                      Bucket: this.bucket,
-                      Key: webpKey,
-                      Body: webpBuf,
-                      ContentType: 'image/webp',
-                    }),
-                  );
-
-                  const newLogoUrl = `${this.publicUrl}/${webpKey}`;
-                  newItems.push({ ...item, logo: newLogoUrl });
-                  arrayModified = true;
-
-                  await this.prisma.media.upsert({
-                    where: { key: webpKey },
-                    create: {
-                      url: newLogoUrl,
-                      key: webpKey,
-                      filename: `${baseName}.webp`,
-                      mimeType: 'image/webp',
-                      size: webpBuf.length,
-                      altText: item.org || item.title || item.degree,
-                    },
-                    update: {
-                      url: newLogoUrl,
-                      size: webpBuf.length,
-                      mimeType: 'image/webp',
-                    },
-                  });
-                  results.converted++;
-                  continue;
-                }
-              } catch (err: any) {
-                results.errors.push(`Logo ${item.logo}: ${err.message}`);
-              }
+            if (!item.logo) {
+              newItems.push(item);
+              continue;
             }
-            newItems.push(item);
+
+            const rawTarget = item.title || item.org || item.degree || 'logo';
+            const baseName = rawTarget
+              .toLowerCase()
+              .trim()
+              .replace(/specialist/g, 'spesialist')
+              .replace(/[^\w\s-()]/g, '')
+              .replace(/\s+/g, '-')
+              .replace(/\(-+/g, '(')
+              .replace(/-+\)/g, ')')
+              .replace(/-+/g, '-')
+              .replace(/^-+|-+$/g, '');
+
+            const webpKey = `optimark/blog/people/logos/${baseName}.webp`;
+            const expectedLogoUrl = `${this.publicUrl}/${webpKey}`;
+
+            if (item.logo === expectedLogoUrl) {
+              newItems.push(item);
+              continue;
+            }
+
+            try {
+              const res = await fetch(item.logo);
+              if (res.ok) {
+                const arrayBuf = await res.arrayBuffer();
+                const inputBuf = Buffer.from(arrayBuf);
+                const webpBuf = await sharp(inputBuf).webp({ quality: 85 }).toBuffer();
+
+                await this.s3.send(
+                  new PutObjectCommand({
+                    Bucket: this.bucket,
+                    Key: webpKey,
+                    Body: webpBuf,
+                    ContentType: 'image/webp',
+                  }),
+                );
+
+                newItems.push({ ...item, logo: expectedLogoUrl });
+                arrayModified = true;
+
+                await this.prisma.media.upsert({
+                  where: { key: webpKey },
+                  create: {
+                    url: expectedLogoUrl,
+                    key: webpKey,
+                    filename: `${baseName}.webp`,
+                    mimeType: 'image/webp',
+                    size: webpBuf.length,
+                    altText: item.title || item.org,
+                  },
+                  update: {
+                    url: expectedLogoUrl,
+                    size: webpBuf.length,
+                    mimeType: 'image/webp',
+                  },
+                });
+                results.converted++;
+                continue;
+              }
+            } catch (err: any) {
+              console.warn(`Failed converting logo for ${baseName}:`, err.message);
+            }
+
+            newItems.push({ ...item, logo: expectedLogoUrl });
+            arrayModified = true;
           }
           return arrayModified ? newItems : items;
         };
@@ -634,9 +663,13 @@ export class MediaService implements OnModuleInit {
     const cleanBase = base
       .toLowerCase()
       .trim()
+      .replace(/specialist/g, 'spesialist')
       .replace(/[^\w\s-()]/g, '')
       .replace(/\s+/g, '-')
-      .replace(/-+/g, '-');
+      .replace(/\(-+/g, '(')
+      .replace(/-+\)/g, ')')
+      .replace(/-+/g, '-')
+      .replace(/^-+|-+$/g, '');
     const cleanFilename = `${cleanBase}.webp`;
 
     // Retain timestamp prefix only for generic words, otherwise use pure clean slug
