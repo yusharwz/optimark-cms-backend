@@ -65,6 +65,8 @@ export class ArticlesService {
         id: article.id,
         title: article.title,
         slug: article.slug,
+        slugId: article.slugId,
+        slugEn: article.slugEn,
         excerpt: article.excerpt,
         content: article.content,
         metaTitle: article.metaTitle,
@@ -110,9 +112,14 @@ export class ArticlesService {
     const authorId = await this.resolvePersonId(dto.authorId);
     const reviewerId = await this.resolvePersonId(dto.reviewerId);
 
+    const slugId = dto.slugId || dto.translations?.id?.slug || slug;
+    const slugEn = dto.slugEn || dto.translations?.en?.slug || undefined;
+
     const data: Prisma.ArticleCreateInput = {
       title: dto.title,
       slug,
+      slugId,
+      slugEn,
       excerpt: dto.excerpt,
       content: dto.content,
       metaTitle: dto.metaTitle || dto.title,
@@ -139,6 +146,7 @@ export class ArticlesService {
       for (const locale of ['id', 'en'] as const) {
         const tr = dto.translations[locale];
         if (tr && (tr.title || tr.content)) {
+          const transSlug = tr.slug || (locale === 'id' ? slugId : slugEn);
           await this.prisma.articleTranslation.upsert({
             where: {
               articleId_locale: {
@@ -148,6 +156,7 @@ export class ArticlesService {
             },
             update: {
               title: tr.title || created.title,
+              slug: transSlug,
               excerpt: tr.excerpt ?? created.excerpt,
               content: tr.content || created.content,
               metaTitle: tr.metaTitle ?? created.metaTitle,
@@ -157,6 +166,7 @@ export class ArticlesService {
               articleId: created.id,
               locale,
               title: tr.title || created.title,
+              slug: transSlug,
               excerpt: tr.excerpt ?? created.excerpt,
               content: tr.content || created.content,
               metaTitle: tr.metaTitle ?? created.metaTitle,
@@ -272,6 +282,28 @@ export class ArticlesService {
       }
     }
 
+    const oldSlugId = current.slugId || current.slug;
+    const oldSlugEn = current.slugEn;
+
+    let slugId = dto.slugId ?? dto.translations?.id?.slug;
+    if (slugId === undefined) {
+      slugId = dto.slug ? slug : current.slugId || slug;
+    }
+
+    let slugEn = dto.slugEn ?? dto.translations?.en?.slug;
+    if (slugEn === undefined) {
+      slugEn = current.slugEn ?? undefined;
+    }
+
+    if (current.status === ArticleStatus.PUBLISHED) {
+      if (slugId && oldSlugId && slugId !== oldSlugId) {
+        await this.redirectsService.recordSlugChange(oldSlugId, slugId);
+      }
+      if (slugEn && oldSlugEn && slugEn !== oldSlugEn) {
+        await this.redirectsService.recordSlugChange(oldSlugEn, slugEn);
+      }
+    }
+
     const content = dto.content !== undefined ? dto.content : current.content;
     const toc = extractTableOfContents(content);
     const readMinutes = dto.readMinutes || calculateReadMinutes(content);
@@ -293,6 +325,8 @@ export class ArticlesService {
     const data: Prisma.ArticleUpdateInput = {
       ...(dto.title ? { title: dto.title } : {}),
       slug,
+      slugId,
+      slugEn,
       ...(dto.excerpt !== undefined ? { excerpt: dto.excerpt } : {}),
       content,
       ...(dto.metaTitle !== undefined ? { metaTitle: dto.metaTitle } : {}),
@@ -320,6 +354,7 @@ export class ArticlesService {
       for (const locale of ['id', 'en'] as const) {
         const tr = dto.translations[locale];
         if (tr) {
+          const transSlug = tr.slug || (locale === 'id' ? slugId : slugEn);
           await this.prisma.articleTranslation.upsert({
             where: {
               articleId_locale: {
@@ -329,6 +364,7 @@ export class ArticlesService {
             },
             update: {
               ...(tr.title ? { title: tr.title } : {}),
+              ...(transSlug ? { slug: transSlug } : {}),
               ...(tr.excerpt !== undefined ? { excerpt: tr.excerpt } : {}),
               ...(tr.content ? { content: tr.content } : {}),
               ...(tr.metaTitle !== undefined ? { metaTitle: tr.metaTitle } : {}),
@@ -338,6 +374,7 @@ export class ArticlesService {
               articleId: id,
               locale,
               title: tr.title || updated.title,
+              slug: transSlug,
               excerpt: tr.excerpt ?? updated.excerpt,
               content: tr.content || updated.content,
               metaTitle: tr.metaTitle ?? updated.metaTitle,

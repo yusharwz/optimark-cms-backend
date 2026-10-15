@@ -21,6 +21,14 @@ export class CreateArticleDto {
 
   @IsString()
   @IsOptional()
+  slugId?: string;
+
+  @IsString()
+  @IsOptional()
+  slugEn?: string;
+
+  @IsString()
+  @IsOptional()
   excerpt?: string;
 
   @IsString()
@@ -84,6 +92,7 @@ export class CreateArticleDto {
   translations?: {
     id?: {
       title?: string;
+      slug?: string;
       excerpt?: string;
       content?: string;
       metaTitle?: string;
@@ -91,6 +100,7 @@ export class CreateArticleDto {
     };
     en?: {
       title?: string;
+      slug?: string;
       excerpt?: string;
       content?: string;
       metaTitle?: string;

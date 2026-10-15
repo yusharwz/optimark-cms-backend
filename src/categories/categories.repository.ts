@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
@@ -7,13 +8,15 @@ import { UpdateCategoryDto } from './dto/update-category.dto';
 export class CategoriesRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(data: CreateCategoryDto & { slug: string }) {
+  async create(data: CreateCategoryDto & { slug: string; slugId?: string; slugEn?: string }) {
     return this.prisma.category.create({
       data: {
         name: data.name,
         nameId: data.nameId || data.name,
         nameEn: data.nameEn,
         slug: data.slug,
+        slugId: data.slugId,
+        slugEn: data.slugEn,
         description: data.description,
         descriptionId: data.descriptionId || data.description,
         descriptionEn: data.descriptionEn,
@@ -49,8 +52,10 @@ export class CategoriesRepository {
   }
 
   async findBySlug(slug: string) {
-    return this.prisma.category.findUnique({
-      where: { slug },
+    return this.prisma.category.findFirst({
+      where: {
+        OR: [{ slug }, { slugId: slug }, { slugEn: slug }],
+      },
       include: {
         _count: {
           select: { articles: true },
@@ -59,7 +64,7 @@ export class CategoriesRepository {
     });
   }
 
-  async update(id: string, data: UpdateCategoryDto) {
+  async update(id: string, data: Prisma.CategoryUpdateInput) {
     return this.prisma.category.update({
       where: { id },
       data,

@@ -8,9 +8,31 @@ export class CommentsRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async findApprovedBySlug(slug: string) {
+    const article = await this.prisma.article.findFirst({
+      where: {
+        OR: [
+          { slug },
+          { slugId: slug },
+          { slugEn: slug },
+          { translations: { some: { slug } } },
+        ],
+      },
+      select: { id: true, slug: true, slugId: true, slugEn: true },
+    });
+
+    const slugMatches = [slug];
+    if (article) {
+      if (article.slug && !slugMatches.includes(article.slug)) slugMatches.push(article.slug);
+      if (article.slugId && !slugMatches.includes(article.slugId)) slugMatches.push(article.slugId);
+      if (article.slugEn && !slugMatches.includes(article.slugEn)) slugMatches.push(article.slugEn);
+    }
+
     return this.prisma.comment.findMany({
       where: {
-        slug,
+        OR: [
+          { slug: { in: slugMatches } },
+          ...(article ? [{ articleId: article.id }] : []),
+        ],
         status: CommentStatus.APPROVED,
         parentId: null, // Root comments
       },

@@ -5,6 +5,8 @@ export interface SyncArticleParams {
   id: string;
   title: string;
   slug: string;
+  slugId?: string | null;
+  slugEn?: string | null;
   excerpt?: string | null;
   content: string;
   metaTitle?: string | null;

@@ -20,6 +20,14 @@ export class UpdateArticleDto {
 
   @IsString()
   @IsOptional()
+  slugId?: string;
+
+  @IsString()
+  @IsOptional()
+  slugEn?: string;
+
+  @IsString()
+  @IsOptional()
   excerpt?: string;
 
   @IsString()
@@ -83,6 +91,7 @@ export class UpdateArticleDto {
   translations?: {
     id?: {
       title?: string;
+      slug?: string;
       excerpt?: string;
       content?: string;
       metaTitle?: string;
@@ -90,6 +99,7 @@ export class UpdateArticleDto {
     };
     en?: {
       title?: string;
+      slug?: string;
       excerpt?: string;
       content?: string;
       metaTitle?: string;

@@ -255,6 +255,8 @@ async function main() {
       where: { slug: art.slug },
       update: {
         title: art.title,
+        slugId: art.slugId || art.slug,
+        slugEn: art.slugEn,
         excerpt: art.excerpt,
         content: art.content,
         metaTitle: art.metaTitle,
@@ -276,6 +278,8 @@ async function main() {
       create: {
         title: art.title,
         slug: art.slug,
+        slugId: art.slugId || art.slug,
+        slugEn: art.slugEn,
         excerpt: art.excerpt,
         content: art.content,
         metaTitle: art.metaTitle,
@@ -310,6 +314,7 @@ async function main() {
             },
             update: {
               title: tr.title,
+              slug: tr.slug,
               excerpt: tr.excerpt,
               content: tr.content,
               metaTitle: tr.metaTitle,
@@ -319,6 +324,7 @@ async function main() {
               articleId: article.id,
               locale,
               title: tr.title,
+              slug: tr.slug,
               excerpt: tr.excerpt,
               content: tr.content,
               metaTitle: tr.metaTitle,

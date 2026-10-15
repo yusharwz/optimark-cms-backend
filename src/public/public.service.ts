@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { SEED_CATEGORIES, SEED_PEOPLE } from '../seed/seed-data';
+import { SEED_CATEGORIES, SEED_PEOPLE, SEED_ARTICLES } from '../seed/seed-data';
 import { ArticleStatus } from '@prisma/client';
 
 @Injectable()
@@ -13,8 +13,9 @@ export class PublicService {
     search?: string;
     page?: number;
     limit?: number;
+    locale?: string;
   }) {
-    const { categorySlug, tag, search, page = 1, limit = 12 } = params;
+    const { categorySlug, tag, search, page = 1, limit = 12, locale } = params;
     const skip = (page - 1) * limit;
 
     const where: any = {
@@ -22,7 +23,9 @@ export class PublicService {
     };
 
     if (categorySlug) {
-      where.category = { slug: categorySlug };
+      where.category = {
+        OR: [{ slug: categorySlug }, { slugId: categorySlug }, { slugEn: categorySlug }],
+      };
     }
 
     if (tag) {
@@ -46,6 +49,8 @@ export class PublicService {
           id: true,
           title: true,
           slug: true,
+          slugId: true,
+          slugEn: true,
           excerpt: true,
           coverImageUrl: true,
           coverImageAlt: true,
@@ -54,8 +59,16 @@ export class PublicService {
           tags: true,
           publishedAt: true,
           contentUpdatedAt: true,
+          translations: {
+            select: {
+              locale: true,
+              title: true,
+              slug: true,
+              excerpt: true,
+            },
+          },
           category: {
-            select: { id: true, name: true, slug: true },
+            select: { id: true, name: true, slug: true, slugId: true, slugEn: true },
           },
           author: {
             select: { id: true, name: true, slug: true, role: true, avatarUrl: true },
@@ -65,8 +78,29 @@ export class PublicService {
       this.prisma.article.count({ where }),
     ]);
 
+    const targetLocale = (locale || 'id').toLowerCase();
+    const mappedItems = items.map((item) => {
+      const tr = item.translations?.find((t) => t.locale === targetLocale);
+      const idSlug = item.slugId || item.slug;
+      const enSlug = item.slugEn || item.slug;
+      const localizedSlug = targetLocale === 'en' ? enSlug : idSlug;
+
+      return {
+        ...item,
+        title: tr?.title || item.title,
+        slug: localizedSlug,
+        slugId: idSlug,
+        slugEn: enSlug,
+        excerpt: tr?.excerpt || item.excerpt,
+        alternateSlugs: {
+          id: idSlug,
+          en: enSlug,
+        },
+      };
+    });
+
     return {
-      data: items,
+      data: mappedItems,
       meta: {
         total,
         page,
@@ -76,20 +110,34 @@ export class PublicService {
     };
   }
 
-  async getPostBySlug(slug: string) {
-    const post = await this.prisma.article.findUnique({
-      where: { slug },
+  async getPostBySlug(slug: string, locale?: string) {
+    const post = await this.prisma.article.findFirst({
+      where: {
+        OR: [
+          { slug },
+          { slugId: slug },
+          { slugEn: slug },
+          { translations: { some: { slug } } },
+        ],
+      },
       include: {
         category: true,
         author: true,
         reviewer: true,
+        translations: true,
       },
     });
 
     if (!post || post.status !== ArticleStatus.PUBLISHED) {
       // Check if there is a 301 redirect for this slug
-      const redirect = await this.prisma.redirect.findUnique({
-        where: { sourcePath: `/blog/${slug}` },
+      const redirect = await this.prisma.redirect.findFirst({
+        where: {
+          OR: [
+            { sourcePath: `/blog/${slug}` },
+            { sourcePath: `/id/blog/${slug}` },
+            { sourcePath: `/en/blog/${slug}` },
+          ],
+        },
       });
       if (redirect && redirect.active) {
         return {
@@ -101,6 +149,39 @@ export class PublicService {
       }
       throw new NotFoundException(`Published post with slug '${slug}' not found.`);
     }
+
+    const idSlug = post.slugId || post.slug;
+    const enSlug = post.slugEn || post.slug;
+    const targetLocale = (locale || 'id').toLowerCase();
+    const canonicalSlug = targetLocale === 'en' ? enSlug : idSlug;
+
+    // Canonical redirect enforcement if requested with mismatched slug for the specified locale
+    if (locale && slug !== canonicalSlug) {
+      return {
+        redirect: {
+          targetPath: targetLocale === 'en' ? `/en/blog/${canonicalSlug}` : `/blog/${canonicalSlug}`,
+          statusCode: 301,
+        },
+      };
+    }
+
+    // Resolve localized content for requested locale
+    const tr = post.translations?.find((t) => t.locale === targetLocale);
+    const resolvedPost = {
+      ...post,
+      title: tr?.title || post.title,
+      slug: canonicalSlug,
+      slugId: idSlug,
+      slugEn: enSlug,
+      excerpt: tr?.excerpt || post.excerpt,
+      content: tr?.content || post.content,
+      metaTitle: tr?.metaTitle || post.metaTitle,
+      metaDescription: tr?.metaDescription || post.metaDescription,
+      alternateSlugs: {
+        id: idSlug,
+        en: enSlug,
+      },
+    };
 
     // Fetch related posts from the same category
     const relatedPosts = await this.prisma.article.findMany({
@@ -115,15 +196,43 @@ export class PublicService {
         id: true,
         title: true,
         slug: true,
+        slugId: true,
+        slugEn: true,
         excerpt: true,
         coverImageUrl: true,
         coverImageAlt: true,
         publishedAt: true,
         readMinutes: true,
+        translations: {
+          select: {
+            locale: true,
+            title: true,
+            slug: true,
+            excerpt: true,
+          },
+        },
       },
     });
 
-    return { post, relatedPosts };
+    const mappedRelatedPosts = relatedPosts.map((rel) => {
+      const relTr = rel.translations?.find((t) => t.locale === targetLocale);
+      const relIdSlug = rel.slugId || rel.slug;
+      const relEnSlug = rel.slugEn || rel.slug;
+      return {
+        ...rel,
+        title: relTr?.title || rel.title,
+        slug: targetLocale === 'en' ? relEnSlug : relIdSlug,
+        slugId: relIdSlug,
+        slugEn: relEnSlug,
+        excerpt: relTr?.excerpt || rel.excerpt,
+        alternateSlugs: {
+          id: relIdSlug,
+          en: relEnSlug,
+        },
+      };
+    });
+
+    return { post: resolvedPost, relatedPosts: mappedRelatedPosts };
   }
 
   async getPreviewByToken(previewToken: string) {
@@ -195,8 +304,10 @@ export class PublicService {
   }
 
   async getCategoryBySlug(slug: string) {
-    const category = await this.prisma.category.findUnique({
-      where: { slug },
+    const category = await this.prisma.category.findFirst({
+      where: {
+        OR: [{ slug }, { slugId: slug }, { slugEn: slug }],
+      },
       include: {
         _count: {
           select: { articles: true },
@@ -217,6 +328,8 @@ export class PublicService {
           name: cat.name,
           nameId: cat.nameId || cat.name,
           nameEn: cat.nameEn || cat.name,
+          slugId: cat.slugId,
+          slugEn: cat.slugEn,
           description: cat.description,
           descriptionId: cat.descriptionId || cat.description,
           descriptionEn: cat.descriptionEn || cat.description,
@@ -231,6 +344,8 @@ export class PublicService {
           nameId: cat.nameId || cat.name,
           nameEn: cat.nameEn || cat.name,
           slug: cat.slug,
+          slugId: cat.slugId,
+          slugEn: cat.slugEn,
           description: cat.description,
           descriptionId: cat.descriptionId || cat.description,
           descriptionEn: cat.descriptionEn || cat.description,
@@ -290,7 +405,68 @@ export class PublicService {
       });
     }
 
-    return { success: true, message: 'Taxonomy and People synchronized with seed data' };
+    for (const art of SEED_ARTICLES) {
+      const existing = await this.prisma.article.findUnique({
+        where: { slug: art.slug },
+      });
+      if (existing) {
+        await this.prisma.article.update({
+          where: { id: existing.id },
+          data: {
+            slugId: art.slugId || art.slug,
+            slugEn: art.slugEn,
+          },
+        });
+
+        if (art.translations) {
+          for (const loc of ['id', 'en'] as const) {
+            const tr = art.translations[loc];
+            if (tr) {
+              await this.prisma.articleTranslation.upsert({
+                where: {
+                  articleId_locale: {
+                    articleId: existing.id,
+                    locale: loc,
+                  },
+                },
+                update: {
+                  title: tr.title,
+                  slug: tr.slug,
+                  excerpt: tr.excerpt,
+                  content: tr.content,
+                  metaTitle: tr.metaTitle,
+                  metaDescription: tr.metaDescription,
+                },
+                create: {
+                  articleId: existing.id,
+                  locale: loc,
+                  title: tr.title,
+                  slug: tr.slug,
+                  excerpt: tr.excerpt,
+                  content: tr.content,
+                  metaTitle: tr.metaTitle,
+                  metaDescription: tr.metaDescription,
+                },
+              });
+            }
+          }
+        }
+      }
+    }
+
+    // Backfill any articles with null slugId
+    const otherArticles = await this.prisma.article.findMany({
+      where: { slugId: null },
+      select: { id: true, slug: true },
+    });
+    for (const o of otherArticles) {
+      await this.prisma.article.update({
+        where: { id: o.id },
+        data: { slugId: o.slug },
+      });
+    }
+
+    return { success: true, message: 'Taxonomy, People, and Articles synchronized with bilingual seed data' };
   }
 
   async getActiveRedirects() {
@@ -310,6 +486,8 @@ export class PublicService {
       orderBy: { publishedAt: 'desc' },
       select: {
         slug: true,
+        slugId: true,
+        slugEn: true,
         publishedAt: true,
         contentUpdatedAt: true,
         coverImageUrl: true,
@@ -319,7 +497,7 @@ export class PublicService {
     });
 
     const categories = await this.prisma.category.findMany({
-      select: { slug: true, updatedAt: true },
+      select: { slug: true, slugId: true, slugEn: true, updatedAt: true },
     });
 
     const authors = await this.prisma.person.findMany({
@@ -330,37 +508,76 @@ export class PublicService {
 
     let xml = `<?xml version="1.0" encoding="UTF-8"?>\n`;
     xml += `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"\n`;
+    xml += `        xmlns:xhtml="http://www.w3.org/1999/xhtml"\n`;
     xml += `        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">\n`;
 
-    // Articles URLs
+    // Articles URLs (Multilingual entries with alternates)
     for (const post of posts) {
-      const loc = `${baseUrl}/blog/${post.slug}`;
+      const idSlug = post.slugId || post.slug;
+      const enSlug = post.slugEn || post.slug;
+      const idLoc = `${baseUrl}/blog/${idSlug}`;
+      const enLoc = `${baseUrl}/en/blog/${enSlug}`;
       const lastmod = (post.contentUpdatedAt || post.publishedAt || new Date()).toISOString();
 
+      const imageXml = post.coverImageUrl
+        ? `    <image:image>\n      <image:loc>${post.coverImageUrl}</image:loc>\n` +
+          (post.coverImageAlt || post.title
+            ? `      <image:title>${(post.coverImageAlt || post.title).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</image:title>\n`
+            : '') +
+          `    </image:image>\n`
+        : '';
+
+      // Indonesian entry
       xml += `  <url>\n`;
-      xml += `    <loc>${loc}</loc>\n`;
+      xml += `    <loc>${idLoc}</loc>\n`;
+      xml += `    <xhtml:link rel="alternate" hreflang="id" href="${idLoc}"/>\n`;
+      xml += `    <xhtml:link rel="alternate" hreflang="en" href="${enLoc}"/>\n`;
+      xml += `    <xhtml:link rel="alternate" hreflang="x-default" href="${idLoc}"/>\n`;
       xml += `    <lastmod>${lastmod}</lastmod>\n`;
       xml += `    <changefreq>weekly</changefreq>\n`;
       xml += `    <priority>0.8</priority>\n`;
+      xml += imageXml;
+      xml += `  </url>\n`;
 
-      if (post.coverImageUrl) {
-        xml += `    <image:image>\n`;
-        xml += `      <image:loc>${post.coverImageUrl}</image:loc>\n`;
-        if (post.coverImageAlt || post.title) {
-          const titleSafe = (post.coverImageAlt || post.title).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-          xml += `      <image:title>${titleSafe}</image:title>\n`;
-        }
-        xml += `    </image:image>\n`;
-      }
-
+      // English entry
+      xml += `  <url>\n`;
+      xml += `    <loc>${enLoc}</loc>\n`;
+      xml += `    <xhtml:link rel="alternate" hreflang="id" href="${idLoc}"/>\n`;
+      xml += `    <xhtml:link rel="alternate" hreflang="en" href="${enLoc}"/>\n`;
+      xml += `    <xhtml:link rel="alternate" hreflang="x-default" href="${idLoc}"/>\n`;
+      xml += `    <lastmod>${lastmod}</lastmod>\n`;
+      xml += `    <changefreq>weekly</changefreq>\n`;
+      xml += `    <priority>0.8</priority>\n`;
+      xml += imageXml;
       xml += `  </url>\n`;
     }
 
-    // Category URLs
+    // Category URLs (Multilingual entries with alternates)
     for (const cat of categories) {
+      const idSlug = cat.slugId || cat.slug;
+      const enSlug = cat.slugEn || cat.slug;
+      const idLoc = `${baseUrl}/blog/kategori/${idSlug}`;
+      const enLoc = `${baseUrl}/en/blog/kategori/${enSlug}`;
+      const lastmod = cat.updatedAt.toISOString();
+
+      // Indonesian category
       xml += `  <url>\n`;
-      xml += `    <loc>${baseUrl}/blog/kategori/${cat.slug}</loc>\n`;
-      xml += `    <lastmod>${cat.updatedAt.toISOString()}</lastmod>\n`;
+      xml += `    <loc>${idLoc}</loc>\n`;
+      xml += `    <xhtml:link rel="alternate" hreflang="id" href="${idLoc}"/>\n`;
+      xml += `    <xhtml:link rel="alternate" hreflang="en" href="${enLoc}"/>\n`;
+      xml += `    <xhtml:link rel="alternate" hreflang="x-default" href="${idLoc}"/>\n`;
+      xml += `    <lastmod>${lastmod}</lastmod>\n`;
+      xml += `    <changefreq>weekly</changefreq>\n`;
+      xml += `    <priority>0.6</priority>\n`;
+      xml += `  </url>\n`;
+
+      // English category
+      xml += `  <url>\n`;
+      xml += `    <loc>${enLoc}</loc>\n`;
+      xml += `    <xhtml:link rel="alternate" hreflang="id" href="${idLoc}"/>\n`;
+      xml += `    <xhtml:link rel="alternate" hreflang="en" href="${enLoc}"/>\n`;
+      xml += `    <xhtml:link rel="alternate" hreflang="x-default" href="${idLoc}"/>\n`;
+      xml += `    <lastmod>${lastmod}</lastmod>\n`;
       xml += `    <changefreq>weekly</changefreq>\n`;
       xml += `    <priority>0.6</priority>\n`;
       xml += `  </url>\n`;

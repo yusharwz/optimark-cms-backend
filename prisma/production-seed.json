@@ -4,25 +4,33 @@
       "slug": "seo",
       "name": "SEO",
       "description": "Strategi optimasi mesin pencari organik, indexing, dan riset keyword",
-      "sortOrder": 1
+      "sortOrder": 1,
+      "slugId": "seo",
+      "slugEn": "seo"
     },
     {
       "slug": "content-marketing",
       "name": "Content Marketing",
       "description": "Strategi pembuatan konten digital, pilar konten, dan repurpose artikel",
-      "sortOrder": 2
+      "sortOrder": 2,
+      "slugId": "content-marketing",
+      "slugEn": "content-marketing"
     },
     {
       "slug": "social-media",
       "name": "Social Media",
       "description": "Optimasi media sosial Instagram, TikTok, jadwal posting dan engagement",
-      "sortOrder": 3
+      "sortOrder": 3,
+      "slugId": "media-sosial",
+      "slugEn": "social-media"
     },
     {
       "slug": "visual-content",
       "name": "Visual Content",
       "description": "Foto produk AI, estetika feed brand, dan video promosi singkat",
-      "sortOrder": 4
+      "sortOrder": 4,
+      "slugId": "konten-visual",
+      "slugEn": "visual-content"
     }
   ],
   "people": [
@@ -84,16 +92,20 @@
           "excerpt": "Kata kunci yang dicari pelanggan di sekitar Anda bisa ditemukan dari Google sendiri, tanpa langganan tools SEO.",
           "content": "Riset keyword adalah langkah awal penting sebelum membuat konten digital. Meskipun ada banyak tool berbayar, Anda tetap bisa memulai riset keyword untuk bisnis lokal dengan cara manual yang efektif. Artikel ini membahas cara memulai riset keyword tanpa biaya tambahan, mulai dari memahami kebutuhan bisnis, mencari kata kunci relevan, hingga menentukan prioritas konten yang tepat.\n\n## 1. Pahami kebutuhan bisnis Anda\n\nSebelum mencari keyword, kenali dulu siapa target audiens Anda dan apa yang mereka cari. Bisnis lokal seperti toko makanan, jasa servis, atau klinik kecantikan memiliki kebutuhan yang berbeda-beda. Misalnya, jika Anda memiliki toko makanan di Jakarta Selatan, target Anda mungkin orang-orang yang mencari “restoran dekat sini” atau “menu makan siang murah”.\n\nSebelum lanjut, jawab tiga pertanyaan ini:\n\n- Siapa pelanggan utama Anda dan di area mana mereka berada?\n- Masalah apa yang ingin mereka selesaikan?\n- Kata apa yang mereka pakai saat bertanya ke teman atau di media sosial?\n\n## 2. Gunakan Google Autocomplete\n\nKetikkan kata kunci utama Anda di Google, lalu lihat saran yang muncul. Fitur autocomplete ini menunjukkan apa yang paling sering dicari orang. Contohnya, jika Anda mengetik “cuci ac”, Google mungkin menyarankan “cuci ac jakarta”, “cuci ac bandung”, atau “cuci ac murah”. Ini membantu Anda menemukan long-tail keyword yang spesifik dan memiliki kompetisi lebih rendah.\n\n### Catat pola yang muncul\n\nSalin setiap saran ke spreadsheet sederhana, lalu kelompokkan berdasarkan lokasi, harga, atau jenis layanan. Pola yang paling sering muncul adalah topik yang paling layak dibuatkan konten.\n\n![Kelompokkan saran autocomplete berdasarkan pola supaya prioritas kontennya terlihat.](/images/blog/artikel-jadi-konten-media-sosial.jpg)\n\n### Bandingkan dengan Google Trends\n\nUntuk membandingkan dua keyword, buka [Google Trends](https://trends.google.com/trends/?geo=ID) dan pilih wilayah Indonesia. Anda bisa melihat keyword mana yang lebih sering dicari dan kapan minatnya naik.\n\n## 3. Analisis kompetitor\n\nLihat website kompetitor Anda. Perhatikan judul halaman, deskripsi meta, dan subjudul mereka. Ini memberikan gambaran tentang keyword apa yang mereka targetkan. Jangan lupa untuk mencatat juga kekurangan konten mereka, sehingga Anda bisa membuat konten yang lebih lengkap dan relevan.\n\nLakukan tiga langkah ini untuk setiap keyword utama:\n\n1. Cari keyword utama Anda di Google dan buka tiga hasil teratas.\n2. Catat judul, deskripsi meta, dan subjudul di setiap halaman.\n3. Tandai topik yang belum mereka bahas, lalu jadikan bahan konten Anda.\n\n## 4. Prioritaskan keyword lokal\n\nJika bisnis Anda berfokus pada area tertentu, pastikan untuk menyertakan nama kota atau wilayah. Misalnya, “jasa fotocopy jakarta timur” atau “kursus memasak bogor”. Keyword lokal memiliki volume pencarian yang lebih kecil, tapi konversinya lebih tinggi karena orang yang mencari biasanya sudah siap untuk melakukan aksi.\n\n> Keyword lokal memang jarang dicari, tapi orang yang mengetiknya biasanya sudah siap datang ke toko Anda.\n> — *Jonathan Anderson T., SEO Lead & Editorial Reviewer*\n\nKalau website Anda belum juga muncul di hasil pencarian, cek penyebabnya di artikel [kenapa website belum muncul di halaman pertama Google](/blog/website-belum-muncul-di-google).\n\n## Penutup\n\nRiset keyword tanpa tools berbayar memang membutuhkan waktu lebih lama, tapi hasilnya sangat berharga. Dengan memahami kebutuhan audiens dan menggunakan sumber daya gratis seperti Google, Anda bisa membuat konten yang relevan dan meningkatkan visibilitas bisnis lokal Anda di mesin pencari.",
           "metaTitle": "Cara Riset Keyword untuk Bisnis Lokal Tanpa Tools Berbayar - Blog OPTIMARK",
-          "metaDescription": "Kata kunci yang dicari pelanggan di sekitar Anda bisa ditemukan dari Google sendiri, tanpa langganan tools SEO."
+          "metaDescription": "Kata kunci yang dicari pelanggan di sekitar Anda bisa ditemukan dari Google sendiri, tanpa langganan tools SEO.",
+          "slug": "riset-keyword-bisnis-lokal"
         },
         "en": {
           "title": "How to Research Keywords for a Local Business Without Paid Tools",
           "excerpt": "The phrases nearby customers search for can be found in Google itself, no SEO tool subscription needed.",
           "content": "Keyword research is an essential first step before creating digital content. Paid tools are plentiful, but you can still start keyword research for a local business with an effective manual approach. This article covers how to research keywords at no extra cost, from understanding your business needs and finding relevant keywords to deciding which content to prioritise.\n\n## 1. Understand your business needs\n\nBefore looking for keywords, get to know your target audience and what they are searching for. Local businesses such as food shops, repair services, or beauty clinics all have different needs. For example, if you run a food shop in South Jakarta, your audience may be people searching for “restaurants near me” or “cheap lunch menu”.\n\nBefore going further, answer these three questions:\n\n- Who are your main customers, and where are they?\n- What problem are they trying to solve?\n- What words do they use when asking friends or posting on social media?\n\n## 2. Use Google Autocomplete\n\nType your main keyword into Google and look at the suggestions that appear. Autocomplete shows what people search for most often. For example, if you type “ac cleaning”, Google might suggest “ac cleaning jakarta”, “ac cleaning bandung”, or “cheap ac cleaning”. This helps you find specific long-tail keywords with lower competition.\n\n### Note the patterns that appear\n\nCopy every suggestion into a simple spreadsheet, then group them by location, price, or service type. The patterns that show up most often are the topics most worth writing about.\n\n![Group autocomplete suggestions by pattern so your content priorities become clear.](/images/blog/artikel-jadi-konten-media-sosial.jpg)\n\n### Compare with Google Trends\n\nTo compare two keywords, open [Google Trends](https://trends.google.com/trends/?geo=ID) and choose Indonesia as the region. You can see which keyword is searched more often and when interest rises.\n\n## 3. Analyse your competitors\n\nLook at your competitors’ websites. Pay attention to their page titles, meta descriptions, and subheadings. This shows you which keywords they are targeting. Also note the gaps in their content, so you can write something more complete and relevant.\n\nFollow these three steps for each main keyword:\n\n1. Search for your main keyword on Google and open the top three results.\n2. Note the title, meta description, and subheadings on each page.\n3. Mark the topics they have not covered, and turn them into your content.\n\n## 4. Prioritise local keywords\n\nIf your business focuses on a specific area, make sure to include the city or district name. For example, “photocopy service east jakarta” or “cooking class bogor”. Local keywords have smaller search volumes, but they convert better because people searching for them are usually ready to act.\n\n> Local keywords may not be searched often, but the people typing them are usually ready to walk into your shop.\n> — *Jonathan Anderson T., SEO Lead & Editorial Reviewer*\n\nIf your website still isn’t showing up in search results, find out why in [why your website isn’t on Google’s first page yet](/blog/website-belum-muncul-di-google).\n\n## Conclusion\n\nKeyword research without paid tools takes longer, but the results are well worth it. By understanding your audience and using free resources like Google, you can create relevant content and improve your local business’s visibility in search engines.",
           "metaTitle": "How to Research Keywords for a Local Business Without Paid Tools - OPTIMARK Blog",
-          "metaDescription": "The phrases nearby customers search for can be found in Google itself, no SEO tool subscription needed."
+          "metaDescription": "The phrases nearby customers search for can be found in Google itself, no SEO tool subscription needed.",
+          "slug": "how-to-research-keywords-local-business"
         }
-      }
+      },
+      "slugId": "riset-keyword-bisnis-lokal",
+      "slugEn": "how-to-research-keywords-local-business"
     },
     {
       "slug": "jadwal-posting-instagram-umkm-kuliner",
@@ -123,16 +135,20 @@
           "excerpt": "Jam posting terbaik bukan angka universal. Untuk bisnis kuliner, jam lapar pelanggan Anda adalah patokannya.",
           "content": "Artikel “jam terbaik posting Instagram” biasanya memberi satu angka untuk semua bisnis. Untuk kuliner, patokan yang lebih jujur adalah kapan pelanggan Anda mulai memikirkan makanan.\n\n## Ikuti jam makan, bukan jam kantor\n\nPosting 30–60 menit sebelum jam makan siang dan makan malam memberi waktu orang melihat, lalu memesan. Cek Insight akun Anda untuk memastikan polanya.\n\n- Uji slot 10.30–11.30 dan 16.30–17.30 selama dua minggu\n- Bandingkan jangkauan per slot di Instagram Insight\n- Simpan Reels menu baru untuk akhir pekan\n- Posting promo sehari sebelum hari gajian\n\n> **Catatan:** Ini artikel contoh yang dipakai untuk meninjau tampilan halaman blog. Gantilah dengan tulisan asli sebelum situs dipublikasikan.",
           "metaTitle": "Jadwal Posting Instagram Terbaik untuk UMKM Kuliner di Tahun 2026 - Blog OPTIMARK",
-          "metaDescription": "Jam posting terbaik bukan angka universal. Untuk bisnis kuliner, jam lapar pelanggan Anda adalah patokannya."
+          "metaDescription": "Jam posting terbaik bukan angka universal. Untuk bisnis kuliner, jam lapar pelanggan Anda adalah patokannya.",
+          "slug": "jadwal-posting-instagram-umkm-kuliner"
         },
         "en": {
           "title": "The Best Instagram Posting Schedule for Food Businesses in 2026",
           "excerpt": "There is no universal best time to post. For food businesses, your customers’ hungry hours are the benchmark.",
           "content": "“Best time to post on Instagram” articles usually give one number for every business. For food, a more honest benchmark is when your customers start thinking about their next meal.\n\n## Follow meal times, not office hours\n\nPosting 30–60 minutes before lunch and dinner gives people time to see the post, then order. Check your account Insights to confirm the pattern.\n\n- Test the 10:30–11:30 and 16:30–17:30 slots for two weeks\n- Compare reach per slot in Instagram Insights\n- Save new-menu Reels for the weekend\n- Post promotions the day before payday\n\n> **Note:** This is a sample article used to review the blog layout. Replace it with real writing before the site goes live.",
           "metaTitle": "The Best Instagram Posting Schedule for Food Businesses in 2026 - OPTIMARK Blog",
-          "metaDescription": "There is no universal best time to post. For food businesses, your customers’ hungry hours are the benchmark."
+          "metaDescription": "There is no universal best time to post. For food businesses, your customers’ hungry hours are the benchmark.",
+          "slug": "best-instagram-posting-schedule-food-smb"
         }
-      }
+      },
+      "slugId": "jadwal-posting-instagram-umkm-kuliner",
+      "slugEn": "best-instagram-posting-schedule-food-smb"
     },
     {
       "slug": "foto-produk-ai-smartphone",
@@ -162,16 +178,20 @@
           "excerpt": "Foto dari smartphone plus sedikit bantuan AI sudah cukup untuk katalog yang rapi, asalkan bahan awalnya benar.",
           "content": "AI bisa membersihkan latar, merapikan cahaya, dan membuat variasi suasana. Tapi hasilnya hanya sebaik foto awal yang Anda ambil dengan smartphone.\n\n## Ambil foto awal yang bersih\n\nGunakan cahaya jendela dari samping, latar polos, dan posisi kamera sejajar produk. Foto yang tajam dan terang memberi AI bahan yang cukup untuk diolah.\n\n- Foto di dekat jendela, hindari lampu kuning\n- Bersihkan lensa sebelum memotret\n- Ambil beberapa sudut untuk setiap produk\n- Gunakan AI untuk latar dan variasi, bukan untuk mengubah bentuk produk\n\n> **Catatan:** Ini artikel contoh yang dipakai untuk meninjau tampilan halaman blog. Gantilah dengan tulisan asli sebelum situs dipublikasikan.",
           "metaTitle": "Panduan Membuat Foto Produk Menarik Pakai AI dari Smartphone - Blog OPTIMARK",
-          "metaDescription": "Foto dari smartphone plus sedikit bantuan AI sudah cukup untuk katalog yang rapi, asalkan bahan awalnya benar."
+          "metaDescription": "Foto dari smartphone plus sedikit bantuan AI sudah cukup untuk katalog yang rapi, asalkan bahan awalnya benar.",
+          "slug": "foto-produk-ai-smartphone"
         },
         "en": {
           "title": "A Guide to Attractive Product Photos Using AI and a Smartphone",
           "excerpt": "Smartphone photos plus a little AI help are enough for a clean catalogue, as long as the source shot is right.",
           "content": "AI can clean up backgrounds, fix lighting, and create mood variations. But the result is only as good as the source photo you take on your phone.\n\n## Take a clean source photo\n\nUse side light from a window, a plain background, and a camera level with the product. A sharp, bright photo gives the AI enough to work with.\n\n- Shoot near a window and avoid warm indoor bulbs\n- Wipe the lens before shooting\n- Take several angles of each product\n- Use AI for backgrounds and variations, not to change the product itself\n\n> **Note:** This is a sample article used to review the blog layout. Replace it with real writing before the site goes live.",
           "metaTitle": "A Guide to Attractive Product Photos Using AI and a Smartphone - OPTIMARK Blog",
-          "metaDescription": "Smartphone photos plus a little AI help are enough for a clean catalogue, as long as the source shot is right."
+          "metaDescription": "Smartphone photos plus a little AI help are enough for a clean catalogue, as long as the source shot is right.",
+          "slug": "smartphone-ai-product-photography-guide"
         }
-      }
+      },
+      "slugId": "foto-produk-ai-smartphone",
+      "slugEn": "smartphone-ai-product-photography-guide"
     },
     {
       "slug": "strategi-content-pillar",
@@ -201,16 +221,20 @@
           "excerpt": "Tiga sampai empat pilar konten membuat Anda tidak lagi bingung mau posting apa setiap pagi.",
           "content": "Brand kecil jarang kehabisan ide karena malas. Biasanya karena setiap hari dimulai dari nol. Content pillar memberi kerangka supaya ide tidak perlu dicari ulang.\n\n## Pilih pilar dari pertanyaan pelanggan\n\nTulis pertanyaan yang paling sering diajukan pelanggan, lalu kelompokkan. Tiap kelompok bisa menjadi satu pilar, misalnya edukasi, produk, di balik layar, dan testimoni.\n\n- Batasi tiga sampai empat pilar\n- Tetapkan porsi tiap pilar per minggu\n- Siapkan lima ide cadangan per pilar\n- Tinjau pilar yang paling banyak disimpan dan dibagikan tiap bulan\n\n> **Catatan:** Ini artikel contoh yang dipakai untuk meninjau tampilan halaman blog. Gantilah dengan tulisan asli sebelum situs dipublikasikan.",
           "metaTitle": "Strategi Content Pillar yang Bikin Brand Kecil Tetap Konsisten Posting - Blog OPTIMARK",
-          "metaDescription": "Tiga sampai empat pilar konten membuat Anda tidak lagi bingung mau posting apa setiap pagi."
+          "metaDescription": "Tiga sampai empat pilar konten membuat Anda tidak lagi bingung mau posting apa setiap pagi.",
+          "slug": "strategi-content-pillar"
         },
         "en": {
           "title": "A Content Pillar Strategy That Keeps Small Brands Posting Consistently",
           "excerpt": "Three or four content pillars mean you no longer wonder what to post every morning.",
           "content": "Small brands rarely run out of ideas out of laziness. Usually every day starts from zero. Content pillars give you a frame so ideas don’t have to be found again.\n\n## Pick pillars from customer questions\n\nWrite down the questions customers ask most, then group them. Each group can become a pillar, for example education, product, behind the scenes, and testimonials.\n\n- Keep it to three or four pillars\n- Set a weekly share for each pillar\n- Keep five backup ideas per pillar\n- Review which pillar gets saved and shared most each month\n\n> **Note:** This is a sample article used to review the blog layout. Replace it with real writing before the site goes live.",
           "metaTitle": "A Content Pillar Strategy That Keeps Small Brands Posting Consistently - OPTIMARK Blog",
-          "metaDescription": "Three or four content pillars mean you no longer wonder what to post every morning."
+          "metaDescription": "Three or four content pillars mean you no longer wonder what to post every morning.",
+          "slug": "content-pillar-strategy-small-brands"
         }
-      }
+      },
+      "slugId": "strategi-content-pillar",
+      "slugEn": "content-pillar-strategy-small-brands"
     },
     {
       "slug": "website-belum-muncul-di-google",
@@ -240,16 +264,20 @@
           "excerpt": "Sebelum menyalahkan algoritma, periksa dulu apakah Google sudah bisa menemukan dan memahami halaman Anda.",
           "content": "Website yang tidak muncul di halaman pertama belum tentu kontennya buruk. Sering kali Google belum mengindeks halaman itu, atau tidak paham halaman itu menjawab pencarian apa.\n\n## Periksa indeks sebelum konten\n\nKetik site:domainanda.com di Google. Kalau halaman penting tidak muncul, masalahnya ada di pengindeksan, bukan di tulisan. Google Search Console bisa menunjukkan alasannya.\n\n- Daftarkan situs dan sitemap di Google Search Console\n- Pastikan setiap halaman punya judul dan H1 yang jelas\n- Perbaiki halaman yang lambat dibuka di ponsel\n- Tautkan halaman baru dari halaman lama yang sudah ramai\n\n> **Catatan:** Ini artikel contoh yang dipakai untuk meninjau tampilan halaman blog. Gantilah dengan tulisan asli sebelum situs dipublikasikan.",
           "metaTitle": "Kenapa Website Kamu Belum Muncul di Halaman Pertama Google - Blog OPTIMARK",
-          "metaDescription": "Sebelum menyalahkan algoritma, periksa dulu apakah Google sudah bisa menemukan dan memahami halaman Anda."
+          "metaDescription": "Sebelum menyalahkan algoritma, periksa dulu apakah Google sudah bisa menemukan dan memahami halaman Anda.",
+          "slug": "website-belum-muncul-di-google"
         },
         "en": {
           "title": "Why Your Website Isn’t on Google’s First Page Yet",
           "excerpt": "Before blaming the algorithm, check whether Google can actually find and understand your pages.",
           "content": "A site missing from the first page doesn’t necessarily have bad content. Often Google hasn’t indexed the page, or can’t tell which search it answers.\n\n## Check indexing before content\n\nSearch site:yourdomain.com on Google. If important pages don’t show up, the problem is indexing, not writing. Google Search Console can show you why.\n\n- Register the site and sitemap in Google Search Console\n- Give every page a clear title and H1\n- Fix pages that load slowly on mobile\n- Link new pages from older pages that already get traffic\n\n> **Note:** This is a sample article used to review the blog layout. Replace it with real writing before the site goes live.",
           "metaTitle": "Why Your Website Isn’t on Google’s First Page Yet - OPTIMARK Blog",
-          "metaDescription": "Before blaming the algorithm, check whether Google can actually find and understand your pages."
+          "metaDescription": "Before blaming the algorithm, check whether Google can actually find and understand your pages.",
+          "slug": "why-website-not-ranking-on-google"
         }
-      }
+      },
+      "slugId": "website-belum-muncul-di-google",
+      "slugEn": "why-website-not-ranking-on-google"
     },
     {
       "slug": "warna-feed-instagram",
@@ -279,16 +307,20 @@
           "excerpt": "Palet feed yang konsisten membuat akun mudah dikenali, bahkan sebelum orang membaca nama brand Anda.",
           "content": "Feed yang rapi bukan soal semua foto harus sama. Yang penting ada dua atau tiga warna yang terus muncul, sehingga akun Anda terasa punya satu karakter.\n\n## Turunkan warna dari logo dan produk\n\nAmbil satu warna utama dari logo, satu warna netral, dan satu aksen dari produk. Gunakan ketiganya di latar foto, teks, dan properti.\n\n- Batasi palet pada tiga warna\n- Simpan kode warna agar desainer dan fotografer sepakat\n- Pakai preset edit yang sama untuk semua foto\n- Lihat grid sembilan post terakhir sebelum mengunggah\n\n> **Catatan:** Ini artikel contoh yang dipakai untuk meninjau tampilan halaman blog. Gantilah dengan tulisan asli sebelum situs dipublikasikan.",
           "metaTitle": "Tips Memilih Warna Feed Instagram yang Sesuai dengan Karakter Brand - Blog OPTIMARK",
-          "metaDescription": "Palet feed yang konsisten membuat akun mudah dikenali, bahkan sebelum orang membaca nama brand Anda."
+          "metaDescription": "Palet feed yang konsisten membuat akun mudah dikenali, bahkan sebelum orang membaca nama brand Anda.",
+          "slug": "warna-feed-instagram"
         },
         "en": {
           "title": "Tips for Choosing Instagram Feed Colours That Match Your Brand",
           "excerpt": "A consistent feed palette makes an account recognisable before anyone reads your brand name.",
           "content": "A tidy feed doesn’t mean every photo looks the same. What matters is two or three colours that keep appearing, so the account feels like one character.\n\n## Derive colours from your logo and product\n\nTake one main colour from the logo, one neutral, and one accent from the product. Use all three in photo backgrounds, text, and props.\n\n- Keep the palette to three colours\n- Save the colour codes so designers and photographers agree\n- Use the same editing preset on every photo\n- Check the last nine posts in the grid before uploading\n\n> **Note:** This is a sample article used to review the blog layout. Replace it with real writing before the site goes live.",
           "metaTitle": "Tips for Choosing Instagram Feed Colours That Match Your Brand - OPTIMARK Blog",
-          "metaDescription": "A consistent feed palette makes an account recognisable before anyone reads your brand name."
+          "metaDescription": "A consistent feed palette makes an account recognisable before anyone reads your brand name.",
+          "slug": "instagram-feed-color-palette-guide"
         }
-      }
+      },
+      "slugId": "warna-feed-instagram",
+      "slugEn": "instagram-feed-color-palette-guide"
     },
     {
       "slug": "caption-tiktok",
@@ -318,16 +350,20 @@
           "excerpt": "Caption TikTok yang baik tidak mengulang isi video. Ia memberi penonton alasan untuk berkomentar.",
           "content": "Penonton TikTok sudah melihat videonya. Caption yang hanya mengulang isi video tidak menambah apa-apa. Caption yang baik membuka percakapan.\n\n## Akhiri dengan pertanyaan yang mudah dijawab\n\nPertanyaan pilihan seperti “Tim pedas atau tim manis?” lebih mudah dijawab daripada pertanyaan terbuka. Semakin ringan jawabannya, semakin banyak yang berkomentar.\n\n- Taruh kalimat terpenting di baris pertama\n- Ajukan satu pertanyaan pilihan di akhir caption\n- Pakai tiga sampai lima hashtag yang relevan\n- Balas komentar awal dalam satu jam pertama\n\n> **Catatan:** Ini artikel contoh yang dipakai untuk meninjau tampilan halaman blog. Gantilah dengan tulisan asli sebelum situs dipublikasikan.",
           "metaTitle": "Cara Menulis Caption TikTok yang Mendorong Penonton untuk Berinteraksi - Blog OPTIMARK",
-          "metaDescription": "Caption TikTok yang baik tidak mengulang isi video. Ia memberi penonton alasan untuk berkomentar."
+          "metaDescription": "Caption TikTok yang baik tidak mengulang isi video. Ia memberi penonton alasan untuk berkomentar.",
+          "slug": "caption-tiktok"
         },
         "en": {
           "title": "How to Write TikTok Captions That Get Viewers Interacting",
           "excerpt": "A good TikTok caption doesn’t repeat the video. It gives viewers a reason to comment.",
           "content": "TikTok viewers have already watched the video. A caption that repeats it adds nothing. A good caption starts a conversation.\n\n## End with an easy question\n\nEither-or questions like “Team spicy or team sweet?” are easier to answer than open ones. The lighter the answer, the more people comment.\n\n- Put the most important line first\n- Ask one either-or question at the end\n- Use three to five relevant hashtags\n- Reply to early comments within the first hour\n\n> **Note:** This is a sample article used to review the blog layout. Replace it with real writing before the site goes live.",
           "metaTitle": "How to Write TikTok Captions That Get Viewers Interacting - OPTIMARK Blog",
-          "metaDescription": "A good TikTok caption doesn’t repeat the video. It gives viewers a reason to comment."
+          "metaDescription": "A good TikTok caption doesn’t repeat the video. It gives viewers a reason to comment.",
+          "slug": "write-engaging-tiktok-captions"
         }
-      }
+      },
+      "slugId": "caption-tiktok",
+      "slugEn": "write-engaging-tiktok-captions"
     },
     {
       "slug": "artikel-jadi-konten-media-sosial",
@@ -357,16 +393,20 @@
           "excerpt": "Satu artikel yang sudah diriset bisa menjadi bahan konten untuk dua minggu, tanpa menulis dari nol lagi.",
           "content": "Artikel blog yang baik berisi riset, contoh, dan kesimpulan. Semua itu bisa dipecah menjadi konten media sosial yang lebih pendek.\n\n## Pecah per poin, bukan per paragraf\n\nSetiap poin utama bisa menjadi satu carousel, setiap kutipan kuat menjadi satu post teks, dan setiap langkah praktis menjadi satu video singkat.\n\n- Satu carousel untuk ringkasan artikel\n- Tiga post kutipan dari kalimat terkuat\n- Tiga video singkat untuk tiap langkah praktis\n- Satu polling dan dua story untuk mengajak diskusi\n\n> **Catatan:** Ini artikel contoh yang dipakai untuk meninjau tampilan halaman blog. Gantilah dengan tulisan asli sebelum situs dipublikasikan.",
           "metaTitle": "Cara Mengubah Satu Artikel Blog Menjadi Sepuluh Konten Media Sosial - Blog OPTIMARK",
-          "metaDescription": "Satu artikel yang sudah diriset bisa menjadi bahan konten untuk dua minggu, tanpa menulis dari nol lagi."
+          "metaDescription": "Satu artikel yang sudah diriset bisa menjadi bahan konten untuk dua minggu, tanpa menulis dari nol lagi.",
+          "slug": "artikel-jadi-konten-media-sosial"
         },
         "en": {
           "title": "How to Turn One Blog Post Into Ten Social Media Posts",
           "excerpt": "One well-researched article can feed two weeks of content without writing from scratch again.",
           "content": "A good blog post holds research, examples, and a conclusion. All of it can be broken into shorter social posts.\n\n## Split by point, not by paragraph\n\nEach main point can become a carousel, each strong quote a text post, and each practical step a short video.\n\n- One carousel summarising the article\n- Three quote posts from the strongest lines\n- Three short videos, one per practical step\n- One poll and two stories to invite discussion\n\n> **Note:** This is a sample article used to review the blog layout. Replace it with real writing before the site goes live.",
           "metaTitle": "How to Turn One Blog Post Into Ten Social Media Posts - OPTIMARK Blog",
-          "metaDescription": "One well-researched article can feed two weeks of content without writing from scratch again."
+          "metaDescription": "One well-researched article can feed two weeks of content without writing from scratch again.",
+          "slug": "turn-one-blog-post-into-ten-social-posts"
         }
-      }
+      },
+      "slugId": "artikel-jadi-konten-media-sosial",
+      "slugEn": "turn-one-blog-post-into-ten-social-posts"
     },
     {
       "slug": "video-promosi-singkat",
@@ -396,16 +436,20 @@
           "excerpt": "Video promosi 15 detik bisa direkam dan diedit sendiri dari smartphone, asalkan tiga detik pertamanya kuat.",
           "content": "Penonton memutuskan menonton atau menggeser dalam beberapa detik pertama. Editor profesional pun tidak bisa menyelamatkan video yang pembukaannya lemah.\n\n## Buka dengan hasil, bukan logo\n\nTunjukkan produk dipakai atau hasil akhirnya di detik pertama. Logo dan nama brand bisa muncul di akhir.\n\n- Rencanakan tiga adegan: hasil, proses, ajakan\n- Rekam dalam format vertikal 9:16\n- Tambahkan teks di layar untuk yang menonton tanpa suara\n- Batasi durasi 15–30 detik\n\n> **Catatan:** Ini artikel contoh yang dipakai untuk meninjau tampilan halaman blog. Gantilah dengan tulisan asli sebelum situs dipublikasikan.",
           "metaTitle": "Membuat Video Promosi Singkat yang Menarik Tanpa Harus Menyewa Editor - Blog OPTIMARK",
-          "metaDescription": "Video promosi 15 detik bisa direkam dan diedit sendiri dari smartphone, asalkan tiga detik pertamanya kuat."
+          "metaDescription": "Video promosi 15 detik bisa direkam dan diedit sendiri dari smartphone, asalkan tiga detik pertamanya kuat.",
+          "slug": "video-promosi-singkat"
         },
         "en": {
           "title": "Making Short, Engaging Promo Videos Without Hiring an Editor",
           "excerpt": "A 15-second promo can be shot and edited on a smartphone, as long as the first three seconds are strong.",
           "content": "Viewers decide whether to keep watching or swipe within the first few seconds. Even a professional editor can’t save a video with a weak opening.\n\n## Open with the result, not the logo\n\nShow the product in use or the end result in the first second. The logo and brand name can come at the end.\n\n- Plan three scenes: result, process, call to action\n- Shoot vertically in 9:16\n- Add on-screen text for people watching muted\n- Keep it to 15–30 seconds\n\n> **Note:** This is a sample article used to review the blog layout. Replace it with real writing before the site goes live.",
           "metaTitle": "Making Short, Engaging Promo Videos Without Hiring an Editor - OPTIMARK Blog",
-          "metaDescription": "A 15-second promo can be shot and edited on a smartphone, as long as the first three seconds are strong."
+          "metaDescription": "A 15-second promo can be shot and edited on a smartphone, as long as the first three seconds are strong.",
+          "slug": "create-engaging-promo-videos-without-editor"
         }
-      }
+      },
+      "slugId": "video-promosi-singkat",
+      "slugEn": "create-engaging-promo-videos-without-editor"
     },
     {
       "slug": "target-audiens",
@@ -435,16 +479,20 @@
           "excerpt": "Konten untuk semua orang biasanya tidak menarik siapa pun. Tentukan dulu siapa yang Anda ajak bicara.",
           "content": "Banyak bisnis online mulai membuat konten sebelum tahu siapa pembacanya. Hasilnya konten yang sopan, tapi tidak terasa ditujukan untuk siapa pun.\n\n## Mulai dari pelanggan yang sudah membeli\n\nLihat sepuluh pelanggan terakhir Anda: usia, pekerjaan, kota, dan alasan mereka membeli. Pola yang muncul adalah titik awal target audiens.\n\n- Wawancarai tiga pelanggan tentang alasan mereka membeli\n- Tulis satu paragraf profil pelanggan ideal\n- Catat kata-kata yang mereka pakai saat bertanya\n- Uji konten ke satu segmen dulu sebelum melebar\n\n> **Catatan:** Ini artikel contoh yang dipakai untuk meninjau tampilan halaman blog. Gantilah dengan tulisan asli sebelum situs dipublikasikan.",
           "metaTitle": "Menentukan Target Audiens Sebelum Mulai Membuat Konten untuk Bisnis Online - Blog OPTIMARK",
-          "metaDescription": "Konten untuk semua orang biasanya tidak menarik siapa pun. Tentukan dulu siapa yang Anda ajak bicara."
+          "metaDescription": "Konten untuk semua orang biasanya tidak menarik siapa pun. Tentukan dulu siapa yang Anda ajak bicara.",
+          "slug": "target-audiens"
         },
         "en": {
           "title": "Defining Your Target Audience Before Creating Content for an Online Business",
           "excerpt": "Content for everyone usually appeals to no one. Decide who you are talking to first.",
           "content": "Many online businesses start making content before they know who it is for. The result is polite content that doesn’t feel meant for anyone.\n\n## Start with customers who already bought\n\nLook at your last ten customers: age, job, city, and why they bought. The pattern that shows up is where your target audience starts.\n\n- Interview three customers about why they bought\n- Write a one-paragraph ideal customer profile\n- Note the words they use when asking questions\n- Test content on one segment before widening\n\n> **Note:** This is a sample article used to review the blog layout. Replace it with real writing before the site goes live.",
           "metaTitle": "Defining Your Target Audience Before Creating Content for an Online Business - OPTIMARK Blog",
-          "metaDescription": "Content for everyone usually appeals to no one. Decide who you are talking to first."
+          "metaDescription": "Content for everyone usually appeals to no one. Decide who you are talking to first.",
+          "slug": "define-target-audience-online-business"
         }
-      }
+      },
+      "slugId": "target-audiens",
+      "slugEn": "define-target-audience-online-business"
     },
     {
       "slug": "insight-instagram",
@@ -474,16 +522,20 @@
           "excerpt": "Jumlah like bukan satu-satunya ukuran. Simpan dan bagikan sering lebih jujur menunjukkan konten yang berguna.",
           "content": "Instagram Insight menyediakan banyak angka, dan mudah tersesat di dalamnya. Beberapa metrik saja sudah cukup untuk menentukan konten apa yang perlu diulang.\n\n## Fokus pada simpan dan bagikan\n\nKonten yang disimpan dianggap berguna, konten yang dibagikan dianggap layak direkomendasikan. Dua metrik ini lebih mencerminkan nilai konten daripada like.\n\n- Bandingkan post per format: foto, carousel, Reels\n- Urutkan post berdasarkan jumlah simpan\n- Catat jam posting dari lima post terbaik\n- Ulangi topik terbaik dengan format berbeda\n\n> **Catatan:** Ini artikel contoh yang dipakai untuk meninjau tampilan halaman blog. Gantilah dengan tulisan asli sebelum situs dipublikasikan.",
           "metaTitle": "Membaca Insight Instagram untuk Mengetahui Konten Mana yang Paling Efektif - Blog OPTIMARK",
-          "metaDescription": "Jumlah like bukan satu-satunya ukuran. Simpan dan bagikan sering lebih jujur menunjukkan konten yang berguna."
+          "metaDescription": "Jumlah like bukan satu-satunya ukuran. Simpan dan bagikan sering lebih jujur menunjukkan konten yang berguna.",
+          "slug": "insight-instagram"
         },
         "en": {
           "title": "Reading Instagram Insights to Find Your Most Effective Content",
           "excerpt": "Likes aren’t the only measure. Saves and shares often show more honestly which content is useful.",
           "content": "Instagram Insights offers plenty of numbers, and it’s easy to get lost. A few metrics are enough to decide which content to repeat.\n\n## Focus on saves and shares\n\nSaved content is seen as useful, shared content as worth recommending. These two reflect a post’s value better than likes.\n\n- Compare posts by format: photo, carousel, Reels\n- Sort posts by number of saves\n- Note the posting times of your top five posts\n- Repeat the best topics in a different format\n\n> **Note:** This is a sample article used to review the blog layout. Replace it with real writing before the site goes live.",
           "metaTitle": "Reading Instagram Insights to Find Your Most Effective Content - OPTIMARK Blog",
-          "metaDescription": "Likes aren’t the only measure. Saves and shares often show more honestly which content is useful."
+          "metaDescription": "Likes aren’t the only measure. Saves and shares often show more honestly which content is useful.",
+          "slug": "reading-instagram-insights-effective-content"
         }
-      }
+      },
+      "slugId": "insight-instagram",
+      "slugEn": "reading-instagram-insights-effective-content"
     }
   ]
 }

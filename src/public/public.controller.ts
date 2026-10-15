@@ -28,19 +28,26 @@ export class PublicController {
     @Query('search') search?: string,
     @Query('page') page?: string,
     @Query('limit') limit?: string,
+    @Query('locale') locale?: string,
   ) {
     const p = page ? parseInt(page, 10) : 1;
     const l = limit ? parseInt(limit, 10) : 12;
     const cat = categorySlug || categorySlugAlt;
-    return this.publicService.getPublishedPosts({ categorySlug: cat, tag, search, page: p, limit: l });
+    return this.publicService.getPublishedPosts({ categorySlug: cat, tag, search, page: p, limit: l, locale });
   }
 
   @Get('posts/:slug')
-  async getPost(@Param('slug') slug: string, @Res({ passthrough: true }) res: Response) {
-    const result = await this.publicService.getPostBySlug(slug);
+  async getPost(
+    @Param('slug') slug: string,
+    @Query('locale') locale?: string,
+    @Res({ passthrough: true }) res?: Response,
+  ) {
+    const result = await this.publicService.getPostBySlug(slug, locale);
     if ('redirect' in result && result.redirect) {
-      res.redirect(result.redirect.statusCode || 301, result.redirect.targetPath);
-      return;
+      if (res) {
+        res.redirect(result.redirect.statusCode || 301, result.redirect.targetPath);
+      }
+      return result;
     }
     return result;
   }

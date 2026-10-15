@@ -54,6 +54,8 @@ model Category {
   nameId            String?   @map("name_id")
   nameEn            String?   @map("name_en")
   slug              String    @unique
+  slugId            String?   @map("slug_id")
+  slugEn            String?   @map("slug_en")
   description       String?
   descriptionId     String?   @map("description_id")
   descriptionEn     String?   @map("description_en")
@@ -105,6 +107,8 @@ model Article {
   id               String        @id @default(cuid())
   title            String
   slug             String        @unique
+  slugId           String?       @map("slug_id")
+  slugEn           String?       @map("slug_en")
   excerpt          String?
   content          String        @db.Text // Full body text (Markdown / rich text)
   metaTitle        String?       @map("meta_title")
@@ -142,6 +146,8 @@ model Article {
   @@index([categoryId])
   @@index([authorId])
   @@index([reviewerId])
+  @@index([slugId])
+  @@index([slugEn])
   @@map("cms_articles")
 }
 
@@ -150,6 +156,7 @@ model ArticleTranslation {
   articleId       String   @map("article_id")
   locale          String   // "id" | "en"
   title           String
+  slug            String?
   excerpt         String?
   content         String   @db.Text
   metaTitle       String?  @map("meta_title")
@@ -161,6 +168,7 @@ model ArticleTranslation {
 
   @@unique([articleId, locale])
   @@index([locale])
+  @@index([slug])
   @@map("cms_article_translations")
 }
 

@@ -18,13 +18,20 @@ export class CommentsService {
 
   async submitComment(dto: CreateCommentDto) {
     // Check if article exists to link articleId
-    const article = await this.prisma.article.findUnique({
-      where: { slug: dto.slug },
-      select: { id: true },
+    const article = await this.prisma.article.findFirst({
+      where: {
+        OR: [
+          { slug: dto.slug },
+          { slugId: dto.slug },
+          { slugEn: dto.slug },
+          { translations: { some: { slug: dto.slug } } },
+        ],
+      },
+      select: { id: true, slug: true },
     });
 
     return this.commentsRepo.create({
-      slug: dto.slug,
+      slug: article?.slug || dto.slug,
       authorName: dto.authorName.trim(),
       authorEmail: dto.authorEmail.trim().toLowerCase(),
       authorWebsite: dto.authorWebsite?.trim() || null,

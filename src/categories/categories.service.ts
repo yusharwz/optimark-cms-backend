@@ -15,9 +15,14 @@ export class CategoriesService {
       throw new ConflictException(`Category with slug '${slug}' already exists.`);
     }
 
+    const slugId = dto.slugId ? slugify(dto.slugId, { lower: true, strict: true }) : (dto.nameId ? slugify(dto.nameId, { lower: true, strict: true }) : slug);
+    const slugEn = dto.slugEn ? slugify(dto.slugEn, { lower: true, strict: true }) : (dto.nameEn ? slugify(dto.nameEn, { lower: true, strict: true }) : undefined);
+
     return this.repository.create({
       ...dto,
       slug,
+      slugId,
+      slugEn,
     });
   }
 
@@ -53,9 +58,14 @@ export class CategoriesService {
       }
     }
 
+    const slugId = dto.slugId !== undefined ? (dto.slugId ? slugify(dto.slugId, { lower: true, strict: true }) : null) : undefined;
+    const slugEn = dto.slugEn !== undefined ? (dto.slugEn ? slugify(dto.slugEn, { lower: true, strict: true }) : null) : undefined;
+
     return this.repository.update(id, {
       ...dto,
       ...(slug ? { slug } : {}),
+      ...(slugId !== undefined ? { slugId } : {}),
+      ...(slugEn !== undefined ? { slugEn } : {}),
     });
   }
 
