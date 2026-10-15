@@ -1,124 +1,132 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Optimark CMS Backend
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+NestJS API service for the Optimark Headless CMS. Powers bilingual article management, Cloudflare R2 media storage with WebP optimization, E-E-A-T author profiles, comment moderation, and on-demand ISR cache revalidation to the Landing Page.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+---
 
-## Description
+## Tech Stack
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- **Runtime**: Node.js 20+ (Alpine/Slim)
+- **Framework**: NestJS 11
+- **Database ORM**: Prisma 7 with PostgreSQL (`optimark_cms` isolated schema)
+- **Storage**: AWS SDK v3 for Cloudflare R2 / S3
+- **Image Processing**: Sharp (automatic WebP conversion & compression)
+- **Authentication**: Passport JWT with bcryptjs
+- **Package Manager**: pnpm
 
-## Project setup
+---
 
-```bash
-$ pnpm install
+## Architecture & Data Flow
+
+```text
+┌─────────────────┐       REST / JSON       ┌──────────────────────┐
+│  CMS Frontend   │ ──────────────────────> │  CMS Backend (3001)  │
+│  (Next.js 3002) │ <────────────────────── │      (NestJS)        │
+└─────────────────┘                         └──────────┬───────────┘
+                                                       │
+                           ┌───────────────────────────┼───────────────────────────┐
+                           ▼                           ▼                           ▼
+                 ┌───────────────────┐       ┌───────────────────┐       ┌───────────────────┐
+                 │    PostgreSQL     │       │   Cloudflare R2   │       │   Landing Page    │
+                 │  (Schema: cms)    │       │  (WebP Media CDN) │       │ (ISR Revalidate)  │
+                 └───────────────────┘       └───────────────────┘       └───────────────────┘
 ```
 
-## Compile and run the project
+---
+
+## Environment Variables
+
+Copy `.env.example` to `.env`:
 
 ```bash
-# development
-$ pnpm run start
-
-# watch mode
-$ pnpm run start:dev
-
-# production mode
-$ pnpm run start:prod
+cp .env.example .env
 ```
 
-## Run tests
+| Variable | Required | Default | Description |
+|---|---|---|---|
+| `PORT` | No | `3001` | HTTP port for the API server |
+| `NODE_ENV` | No | `development` | Environment mode (`development` / `production`) |
+| `DATABASE_URL` | **Yes** | — | PostgreSQL connection string, e.g. `postgresql://user:pass@host:5432/db?schema=optimark_cms` |
+| `JWT_SECRET` | **Yes** | — | Secret string for signing JWT tokens |
+| `ADMIN_EMAIL` | No | `admin@optimark.ai` | Default admin email auto-seeded on first run |
+| `ADMIN_PASSWORD` | No | `AdminOptimark2026!` | Initial password for the admin account |
+| `ADMIN_NAME` | No | `Admin Optimark` | Full name of the initial admin user |
+| `CORS_ORIGIN` | No | `*` / request origin | Comma-separated allowed origins (e.g. `https://cms.optimark.ai,https://optimark.ai`) |
+| `R2_ENDPOINT` | **Yes** | — | Cloudflare R2 S3 endpoint (`https://<account_id>.r2.cloudflarestorage.com`) |
+| `R2_ACCESS_KEY` | **Yes** | — | Cloudflare R2 Access Key ID |
+| `R2_SECRET_KEY` | **Yes** | — | Cloudflare R2 Secret Access Key |
+| `R2_BUCKET` | **Yes** | `optimark-cms-media` | Target bucket name in Cloudflare R2 |
+| `R2_PUBLIC_URL` | **Yes** | `https://media.optimark.ai` | Public CDN URL serving the bucket assets |
+| `LANDING_PAGE_REVALIDATE_URL` | No | `http://localhost:3000/api/revalidate` | Landing page webhook URL to invalidate ISR cache |
+| `REVALIDATE_SECRET` | No | `optimark_cms_revalidate_secret_2026` | Shared secret header matching landing page |
+| `PUBLIC_SITE_URL` | No | `https://optimark.ai` | Canonical domain used for sitemap generation |
+
+---
+
+## Local Development
 
 ```bash
-# unit tests
-$ pnpm run test
+# 1. Install dependencies
+pnpm install
 
-# e2e tests
-$ pnpm run test:e2e
+# 2. Setup environment
+cp .env.example .env
+# Edit .env with your local PostgreSQL and R2 credentials
 
-# test coverage
-$ pnpm run test:cov
+# 3. Generate Prisma client & sync schema
+pnpm prisma generate
+pnpm prisma db push
+
+# 4. (Optional) Run initial seed data
+node prisma/seed.mjs
+
+# 5. Start dev server
+pnpm run start:dev
 ```
 
-## Deployment
+Server starts at `http://localhost:3001/api`.
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+---
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+## Production Deployment (Docker)
+
+The included `Dockerfile` handles everything automatically on startup:
+1. Compiles the TypeScript application with caching.
+2. Runs `npx prisma db push --accept-data-loss` to sync database tables on the specified schema.
+3. Runs `node prisma/seed.mjs` (idempotent, skips if data already exists).
+4. Boots the production server (`node dist/main`).
 
 ```bash
-$ pnpm install -g @nestjs/mau
-$ mau deploy
+# Build image
+docker build -t optimark-cms-backend:latest .
+
+# Run container
+docker run -d \
+  --name optimark-cms-backend \
+  -p 3001:3001 \
+  --env-file .env \
+  optimark-cms-backend:latest
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+---
 
-## Observability
+## Key API Endpoints
 
-In production applications, observability is essential for understanding how your system behaves, detecting issues early, and maintaining reliable performance.
+### Public Endpoints (Consumed by Landing Page)
+- `GET /api/public/articles` - List published articles (bilingual, filters by category/tag/locale)
+- `GET /api/public/articles/:slug` - Single article details with related posts & author E-E-A-T
+- `GET /api/public/categories` - List all active categories
+- `GET /api/public/tags` - List all tags
+- `GET /api/public/people` - Authors and reviewers profiles
+- `POST /api/public/comments` - Submit comment (with honeypot & time-gate protection)
+- `GET /api/public/comments?articleId=...` - Fetch approved comments
+- `GET /api/public/sitemap.xml` - Dynamic XML sitemap of all articles
 
-[NestJS Observe](https://observe.nestjs.com) automatically instruments your NestJS application, giving you deep visibility into your system with minimal setup:
-
-- **Distributed tracing:** Follow requests across services and understand how they flow through your system.
-- **Waterfall analysis:** Visualize request execution and identify slow operations, bottlenecks, and unexpected delays.
-- **Performance analysis:** Analyze application performance in real time and quickly pinpoint areas that need optimization.
-- **Metrics:** Track key application and infrastructure metrics to understand system health and performance trends.
-- **Logging:** Centralize and correlate logs with traces and other telemetry to make debugging easier.
-- **Error tracking:** Detect errors quickly and investigate their root causes with the surrounding context.
-- **SLA monitoring:** Track service-level objectives and identify when your application is approaching or exceeding defined thresholds.
-- **Alarms and alerts:** Set up alerts for critical errors, performance degradation, SLA violations, and other anomalies so your team can react quickly.
-
-To add it to this project:
-
-```bash
-$ pnpm install @nestjs/observe
-```
-
-Then follow the [setup guide](https://docs.nestjs.com/observability/overview) - it takes a single import and an app key.
-
-The free plan needs no payment details and covers 300,000 events a month. You can also browse the [live demo](https://www.observe-demo.nestjs.com/dashboard) first - the whole dashboard over a busy service's data, with nothing to install.
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Auto-instrument your application with [NestJS Observe](https://observe.nestjs.com). Distributed tracing, metrics, and logging made easy. Error tracking and performance monitoring for your NestJS applications.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+### Protected Endpoints (Consumed by CMS Frontend, requires Bearer JWT)
+- `POST /api/auth/login` - Authenticate admin / editor / author
+- `GET /api/auth/profile` - Current user session info
+- `POST /api/auth/change-password` - Update account password
+- `GET /api/articles` / `POST /api/articles` / `PUT /api/articles/:id` - Full CMS CRUD
+- `POST /api/media/upload` - Direct file upload with Sharp WebP optimization
+- `GET /api/media` - Media asset browser and alt text management
+- `GET /api/comments` / `PATCH /api/comments/:id/status` - Comment moderation queue

@@ -23,8 +23,8 @@ export class MediaService implements OnModuleInit {
     const endpoint = process.env.R2_ENDPOINT;
     const accessKeyId = process.env.R2_ACCESS_KEY;
     const secretAccessKey = process.env.R2_SECRET_KEY;
-    this.bucket = process.env.R2_BUCKET || 'cms-staging-dokploy';
-    this.publicUrl = (process.env.R2_PUBLIC_URL || 'https://optimark-staging-media.dritech.co.id').replace(/\/+$/, '');
+    this.bucket = process.env.R2_BUCKET || 'optimark-cms-media';
+    this.publicUrl = (process.env.R2_PUBLIC_URL || 'https://media.optimark.ai').replace(/\/+$/, '');
 
     if (!endpoint || !accessKeyId || !secretAccessKey) {
       console.warn('R2 credentials not fully configured in MediaService');

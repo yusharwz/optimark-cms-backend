@@ -4,7 +4,7 @@ import { Injectable, Logger } from '@nestjs/common';
 export class RevalidationService {
   private readonly logger = new Logger(RevalidationService.name);
   private readonly revalidateUrl =
-    process.env.LANDING_PAGE_REVALIDATE_URL || 'http://landing-page:3000/api/revalidate';
+    process.env.LANDING_PAGE_REVALIDATE_URL || 'http://localhost:3000/api/revalidate';
   private readonly secret =
     process.env.REVALIDATE_SECRET ||
     process.env.LANDING_PAGE_REVALIDATE_SECRET ||

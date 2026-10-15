@@ -46,6 +46,13 @@ export class SeedService implements OnApplicationBootstrap {
   }
 
   async runSeed() {
+    const configuredBase = (process.env.R2_PUBLIC_URL || '').replace(/\/+$/, '');
+    const normalizeMediaUrl = (url?: string | null): string | undefined => {
+      if (!url) return undefined;
+      if (!configuredBase) return url;
+      return url.replace('https://optimark-staging-media.dritech.co.id', configuredBase);
+    };
+
     // 1. Seed Categories
     const categoryMap = new Map<string, string>();
     for (const cat of SEED_CATEGORIES) {
@@ -108,7 +115,7 @@ export class SeedService implements OnApplicationBootstrap {
           experienceEn: p.experienceEn as any,
           educationId: p.educationId as any,
           educationEn: p.educationEn as any,
-          avatarUrl: p.avatarUrl,
+          avatarUrl: normalizeMediaUrl(p.avatarUrl),
           linkedinUrl: p.linkedinUrl,
           type: p.type as any,
         },
@@ -129,7 +136,7 @@ export class SeedService implements OnApplicationBootstrap {
           experienceEn: p.experienceEn as any,
           educationId: p.educationId as any,
           educationEn: p.educationEn as any,
-          avatarUrl: p.avatarUrl,
+          avatarUrl: normalizeMediaUrl(p.avatarUrl),
           linkedinUrl: p.linkedinUrl,
           type: p.type as any,
         },
@@ -157,7 +164,7 @@ export class SeedService implements OnApplicationBootstrap {
           content: art.content,
           metaTitle: art.metaTitle,
           metaDescription: art.metaDescription,
-          coverImageUrl: art.coverImageUrl,
+          coverImageUrl: normalizeMediaUrl(art.coverImageUrl),
           coverImageAlt: art.coverImageAlt,
           canonicalUrl: art.canonicalUrl,
           tags: art.tags,
@@ -182,7 +189,7 @@ export class SeedService implements OnApplicationBootstrap {
           content: art.content,
           metaTitle: art.metaTitle,
           metaDescription: art.metaDescription,
-          coverImageUrl: art.coverImageUrl,
+          coverImageUrl: normalizeMediaUrl(art.coverImageUrl),
           coverImageAlt: art.coverImageAlt,
           canonicalUrl: art.canonicalUrl,
           tags: art.tags,

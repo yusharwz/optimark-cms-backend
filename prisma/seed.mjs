@@ -135,16 +135,16 @@ function markdownToBlocks(markdown) {
 async function main() {
   console.log('🌱 Starting database seeding...');
 
-  // Auto-migrate any legacy optimark.ai URLs to Cloudflare R2 staging
+  // Auto-migrate any legacy optimark.ai URLs to Cloudflare R2
   try {
-    const r2Base = 'https://optimark-staging-media.dritech.co.id/optimark/blog/';
+    const r2Base = `${(process.env.R2_PUBLIC_URL || 'https://media.optimark.ai').replace(/\/+$/, '')}/optimark/blog/`;
     await prisma.$executeRawUnsafe(`
       UPDATE cms_articles SET "cover_image_url" = REPLACE("cover_image_url", 'https://optimark.ai/images/blog/', '${r2Base}') WHERE "cover_image_url" LIKE '%optimark.ai%';
     `);
     await prisma.$executeRawUnsafe(`
       UPDATE cms_people SET "avatar_url" = REPLACE("avatar_url", 'https://optimark.ai/images/blog/', '${r2Base}') WHERE "avatar_url" LIKE '%optimark.ai%';
     `);
-    console.log('🖼️ Legacy optimark.ai images migrated to Cloudflare R2 staging.');
+    console.log(`🖼️ Images checked and aligned with Cloudflare R2 (${r2Base}).`);
   } catch (err) {
     console.warn('Image migration notice:', err.message);
   }
@@ -190,7 +190,8 @@ async function main() {
   console.log(`✅ People (E-E-A-T) seeded: ${personMap.size} profiles`);
 
   // 2.5 Seed Initial Users (Admin & Authors)
-  const defaultPasswordHash = bcrypt.hashSync('Asdqwe123!', 10);
+  const initialPassword = process.env.INITIAL_PASSWORD || process.env.ADMIN_PASSWORD || 'Asdqwe123!';
+  const defaultPasswordHash = bcrypt.hashSync(initialPassword, 10);
   const usersToSeed = [
     {
       email: 'admin@optimark.ai',

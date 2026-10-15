@@ -12,6 +12,13 @@ export class AuthService implements OnModuleInit {
   ) {}
 
   async onModuleInit() {
+    const adminEmail = (process.env.ADMIN_EMAIL || 'admin@optimark.ai').toLowerCase().trim();
+    const adminPass = process.env.ADMIN_PASSWORD || 'AdminOptimark2026!';
+    const adminName = process.env.ADMIN_NAME || 'Admin Optimark';
+    const authorPass = process.env.INITIAL_AUTHOR_PASSWORD || adminPass;
+    const authorHash = bcrypt.hashSync(authorPass, 10);
+    const adminHash = bcrypt.hashSync(adminPass, 10);
+
     try {
       await this.prisma.$executeRawUnsafe(`
         DO $$ BEGIN
@@ -68,23 +75,16 @@ export class AuthService implements OnModuleInit {
         );
       `).catch(() => {});
 
-      const hash = bcrypt.hashSync('AdminOptimark2026!', 10);
-      await this.prisma.$executeRawUnsafe(`
-        INSERT INTO cms_users (id, email, password_hash, name, role)
-        VALUES ('admin-init-id', 'admin@optimark.ai', '${hash}', 'Admin Optimark', 'ADMIN')
-        ON CONFLICT (email) DO UPDATE SET password_hash = '${hash}';
-      `).catch(() => {});
-
       await this.prisma.$executeRawUnsafe(`
         INSERT INTO cms_users (id, email, password_hash, name, role, person_id)
-        SELECT 'rafi-init-id', 'rafi@optimark.ai', '${hash}', 'Rafi Rizky', 'AUTHOR', id
+        SELECT 'rafi-init-id', 'rafi@optimark.ai', '${authorHash}', 'Rafi Rizky', 'AUTHOR', id
         FROM cms_people WHERE slug = 'rafi-rizky'
         ON CONFLICT (email) DO NOTHING;
       `).catch(() => {});
 
       await this.prisma.$executeRawUnsafe(`
         INSERT INTO cms_users (id, email, password_hash, name, role, person_id)
-        SELECT 'thia-init-id', 'thia@optimark.ai', '${hash}', 'Thia Rahmani', 'AUTHOR', id
+        SELECT 'thia-init-id', 'thia@optimark.ai', '${authorHash}', 'Thia Rahmani', 'AUTHOR', id
         FROM cms_people WHERE slug = 'thia-rahmani'
         ON CONFLICT (email) DO NOTHING;
       `).catch(() => {});
@@ -94,19 +94,18 @@ export class AuthService implements OnModuleInit {
 
     // Update admin password using Prisma client parameterization to avoid SQL escaping issues
     try {
-      const hash = bcrypt.hashSync('AdminOptimark2026!', 10);
       await this.prisma.user.upsert({
-        where: { email: 'admin@optimark.ai' },
-        update: { passwordHash: hash },
+        where: { email: adminEmail },
+        update: { passwordHash: adminHash, name: adminName, role: 'ADMIN' },
         create: {
           id: 'admin-init-id',
-          email: 'admin@optimark.ai',
-          name: 'Admin Optimark',
+          email: adminEmail,
+          name: adminName,
           role: 'ADMIN',
-          passwordHash: hash,
+          passwordHash: adminHash,
         },
       });
-      console.log('✅ Synchronized admin@optimark.ai password via Prisma');
+      console.log(`✅ Synchronized admin account (${adminEmail}) via Prisma`);
     } catch (err: any) {
       console.warn('⚠️ Admin sync warning:', err.message);
     }
@@ -126,9 +125,9 @@ export class AuthService implements OnModuleInit {
 
     const isMatch = bcrypt.compareSync(pass, user.passwordHash);
     if (!isMatch) {
-      // Fallback check: if emergency initial password matches, auto-heal the hash in database
-      if (pass === 'AdminOptimark2026!') {
-        const newHash = bcrypt.hashSync('AdminOptimark2026!', 10);
+      const configuredAdminPass = process.env.ADMIN_PASSWORD;
+      if (configuredAdminPass && pass === configuredAdminPass && user.role === 'ADMIN') {
+        const newHash = bcrypt.hashSync(configuredAdminPass, 10);
         await this.prisma.user.update({
           where: { id: user.id },
           data: { passwordHash: newHash },

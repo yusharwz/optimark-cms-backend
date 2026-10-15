@@ -7,8 +7,12 @@ async function bootstrap() {
   const logger = new Logger('Bootstrap');
 
   // Enable CORS for CMS Frontend and Landing Page
+  const corsOrigin = process.env.CORS_ORIGIN
+    ? process.env.CORS_ORIGIN.split(',').map((o) => o.trim())
+    : true;
+
   app.enableCors({
-    origin: '*',
+    origin: corsOrigin,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
   });
