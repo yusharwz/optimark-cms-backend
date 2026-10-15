@@ -3,6 +3,7 @@ import {
   Get,
   Post,
   Patch,
+  Delete,
   Param,
   Body,
   Query,
@@ -81,5 +82,10 @@ export class MediaController {
   @Patch(':id/alt')
   async updateAlt(@Param('id') id: string, @Body() dto: UpdateMediaAltDto) {
     return this.mediaService.updateAltText(id, dto.altText);
+  }
+
+  @Delete(':id')
+  async deleteMedia(@Param('id') id: string) {
+    return this.mediaService.deleteMedia(id);
   }
 }

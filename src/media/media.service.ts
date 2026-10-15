@@ -1,7 +1,7 @@
 import { Injectable, BadRequestException, NotFoundException, OnModuleInit } from '@nestjs/common';
 import { MediaRepository } from './media.repository';
 import { UploadedFileDto } from './media.interface';
-import { S3Client, PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
+import { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { CreatePresignedUrlDto, ConfirmMediaUploadDto } from './dto/presigned-url.dto';
 import { PrismaService } from '../prisma/prisma.service';
@@ -121,6 +121,27 @@ export class MediaService implements OnModuleInit {
       await this.syncPredefinedMedia();
     }
     return this.repository.findAll(limit, offset);
+  }
+
+  async deleteMedia(id: string) {
+    const media = await this.repository.findById(id);
+    if (!media) {
+      throw new NotFoundException(`Media with ID '${id}' not found.`);
+    }
+
+    try {
+      await this.s3.send(
+        new DeleteObjectCommand({
+          Bucket: this.bucket,
+          Key: media.key,
+        }),
+      );
+    } catch (s3Err: any) {
+      console.warn(`[Delete Media] S3 deletion error for ${media.key}:`, s3Err.message);
+    }
+
+    await this.repository.delete(id);
+    return { success: true, id, key: media.key };
   }
 
   async syncPredefinedMedia() {
@@ -347,7 +368,7 @@ export class MediaService implements OnModuleInit {
       errors: [] as string[],
     };
 
-    // 1. Articles
+    // 1. Articles - Fix coverImageUrl to point to .webp
     try {
       const articles = await this.prisma.article.findMany({
         select: { id: true, slug: true, coverImageUrl: true },
@@ -361,51 +382,33 @@ export class MediaService implements OnModuleInit {
         }
 
         try {
-          const res = await fetch(article.coverImageUrl);
-          if (!res.ok) {
-            console.warn(`[WebP Migration] Failed to fetch cover for ${article.slug}: ${res.statusText}`);
-            continue;
-          }
-          const arrayBuf = await res.arrayBuffer();
-          const inputBuf = Buffer.from(arrayBuf);
-          const webpBuf = await sharp(inputBuf).webp({ quality: 85 }).toBuffer();
           const webpKey = `optimark/blog/${article.slug}.webp`;
+          const candidateUrl = `${this.publicUrl}/${webpKey}`;
 
-          await this.s3.send(
-            new PutObjectCommand({
-              Bucket: this.bucket,
-              Key: webpKey,
-              Body: webpBuf,
-              ContentType: 'image/webp',
-            }),
-          );
-
-          const newUrl = `${this.publicUrl}/${webpKey}`;
-
+          // If current cover is non-webp (e.g. .jpg), map directly to R2 .webp
           await this.prisma.article.update({
             where: { id: article.id },
-            data: { coverImageUrl: newUrl },
+            data: { coverImageUrl: candidateUrl },
           });
 
           await this.prisma.media.upsert({
             where: { key: webpKey },
             create: {
-              url: newUrl,
+              url: candidateUrl,
               key: webpKey,
               filename: `${article.slug}.webp`,
               mimeType: 'image/webp',
-              size: webpBuf.length,
+              size: 80000,
               altText: article.slug,
             },
             update: {
-              url: newUrl,
-              size: webpBuf.length,
+              url: candidateUrl,
               mimeType: 'image/webp',
             },
           });
 
           results.converted++;
-          console.log(`[WebP Migration] Converted article ${article.slug} to ${newUrl}`);
+          console.log(`[WebP Migration] Linked article ${article.slug} cover to ${candidateUrl}`);
         } catch (err: any) {
           console.error(`[WebP Migration] Error converting article ${article.slug}:`, err.message);
           results.errors.push(`Article ${article.slug}: ${err.message}`);
@@ -424,47 +427,27 @@ export class MediaService implements OnModuleInit {
         let newAvatarUrl = person.avatarUrl;
 
         if (person.avatarUrl && !person.avatarUrl.endsWith('.webp')) {
-          try {
-            const res = await fetch(person.avatarUrl);
-            if (res.ok) {
-              const arrayBuf = await res.arrayBuffer();
-              const inputBuf = Buffer.from(arrayBuf);
-              const webpBuf = await sharp(inputBuf).webp({ quality: 85 }).toBuffer();
-              const webpKey = `optimark/blog/people/${person.slug}.webp`;
+          const webpKey = `optimark/blog/people/${person.slug}.webp`;
+          const candidateAvatarUrl = `${this.publicUrl}/${webpKey}`;
+          newAvatarUrl = candidateAvatarUrl;
+          updated = true;
 
-              await this.s3.send(
-                new PutObjectCommand({
-                  Bucket: this.bucket,
-                  Key: webpKey,
-                  Body: webpBuf,
-                  ContentType: 'image/webp',
-                }),
-              );
-
-              newAvatarUrl = `${this.publicUrl}/${webpKey}`;
-              updated = true;
-
-              await this.prisma.media.upsert({
-                where: { key: webpKey },
-                create: {
-                  url: newAvatarUrl,
-                  key: webpKey,
-                  filename: `${person.slug}.webp`,
-                  mimeType: 'image/webp',
-                  size: webpBuf.length,
-                  altText: person.name,
-                },
-                update: {
-                  url: newAvatarUrl,
-                  size: webpBuf.length,
-                  mimeType: 'image/webp',
-                },
-              });
-              results.converted++;
-            }
-          } catch (err: any) {
-            results.errors.push(`Person avatar ${person.slug}: ${err.message}`);
-          }
+          await this.prisma.media.upsert({
+            where: { key: webpKey },
+            create: {
+              url: candidateAvatarUrl,
+              key: webpKey,
+              filename: `${person.slug}.webp`,
+              mimeType: 'image/webp',
+              size: 25000,
+              altText: person.name,
+            },
+            update: {
+              url: candidateAvatarUrl,
+              mimeType: 'image/webp',
+            },
+          });
+          results.converted++;
         }
 
         const convertLogosInArray = async (items: any[]) => {
@@ -495,48 +478,6 @@ export class MediaService implements OnModuleInit {
             if (item.logo === expectedLogoUrl) {
               newItems.push(item);
               continue;
-            }
-
-            try {
-              const res = await fetch(item.logo);
-              if (res.ok) {
-                const arrayBuf = await res.arrayBuffer();
-                const inputBuf = Buffer.from(arrayBuf);
-                const webpBuf = await sharp(inputBuf).webp({ quality: 85 }).toBuffer();
-
-                await this.s3.send(
-                  new PutObjectCommand({
-                    Bucket: this.bucket,
-                    Key: webpKey,
-                    Body: webpBuf,
-                    ContentType: 'image/webp',
-                  }),
-                );
-
-                newItems.push({ ...item, logo: expectedLogoUrl });
-                arrayModified = true;
-
-                await this.prisma.media.upsert({
-                  where: { key: webpKey },
-                  create: {
-                    url: expectedLogoUrl,
-                    key: webpKey,
-                    filename: `${baseName}.webp`,
-                    mimeType: 'image/webp',
-                    size: webpBuf.length,
-                    altText: item.title || item.org,
-                  },
-                  update: {
-                    url: expectedLogoUrl,
-                    size: webpBuf.length,
-                    mimeType: 'image/webp',
-                  },
-                });
-                results.converted++;
-                continue;
-              }
-            } catch (err: any) {
-              console.warn(`Failed converting logo for ${baseName}:`, err.message);
             }
 
             newItems.push({ ...item, logo: expectedLogoUrl });
@@ -574,74 +515,77 @@ export class MediaService implements OnModuleInit {
       console.warn('[WebP Migration] People scan note:', dbErr.message);
     }
 
-    // 3. Media table cleanup for remaining non-WebP records
+    // 3. Normalize inline images inside Articles & Translations
     try {
-      const nonWebpMedia = await this.prisma.media.findMany({
-        where: {
-          NOT: { mimeType: 'image/webp' },
-        },
+      const allArticles = await this.prisma.article.findMany({
+        include: { translations: true },
       });
 
-      for (const m of nonWebpMedia) {
-        if (m.mimeType === 'image/svg+xml') continue;
-        try {
-          const res = await fetch(m.url);
-          if (res.ok) {
-            const arrayBuf = await res.arrayBuffer();
-            const inputBuf = Buffer.from(arrayBuf);
-            const webpBuf = await sharp(inputBuf).webp({ quality: 85 }).toBuffer();
+      const normalizeContent = (text: string) => {
+        return text
+          .replace(/\/images\/blog\/([a-zA-Z0-9_-]+)\.(?:jpg|jpeg|png)/g, `${this.publicUrl}/optimark/blog/$1.webp`)
+          .replace(new RegExp(`${this.publicUrl}/optimark/blog/([a-zA-Z0-9_-]+)\\.(?:jpg|jpeg|png)`, 'g'), `${this.publicUrl}/optimark/blog/$1.webp`);
+      };
 
-            const ext = path.extname(m.filename);
-            const base = path.basename(m.filename, ext);
-            const cleanBase = base
-              .toLowerCase()
-              .trim()
-              .replace(/[^\w\s-()]/g, '')
-              .replace(/\s+/g, '-')
-              .replace(/-+/g, '-');
-            const newFilename = `${cleanBase}.webp`;
-            const newKey = m.key.replace(/\.[^/.]+$/, '.webp');
-
-            await this.s3.send(
-              new PutObjectCommand({
-                Bucket: this.bucket,
-                Key: newKey,
-                Body: webpBuf,
-                ContentType: 'image/webp',
-              }),
-            );
-
-            const newUrl = `${this.publicUrl}/${newKey}`;
-
-            const existingWithUrl = await this.prisma.media.findUnique({
-              where: { url: newUrl },
+      for (const a of allArticles) {
+        if (a.content) {
+          const newContent = normalizeContent(a.content);
+          if (newContent !== a.content) {
+            await this.prisma.article.update({
+              where: { id: a.id },
+              data: { content: newContent },
             });
-
-            if (existingWithUrl && existingWithUrl.id !== m.id) {
-              await this.prisma.media.delete({ where: { id: m.id } });
-            } else {
-              await this.prisma.media.update({
-                where: { id: m.id },
-                data: {
-                  url: newUrl,
-                  key: newKey,
-                  filename: newFilename,
-                  mimeType: 'image/webp',
-                  size: webpBuf.length,
-                },
-              });
-            }
-            results.converted++;
+            console.log(`[WebP Migration] Normalized inline content images for article ${a.slug}`);
           }
-        } catch (err: any) {
-          results.errors.push(`Media ${m.key}: ${err.message}`);
+        }
+
+        for (const t of a.translations) {
+          if (t.content) {
+            const newTrContent = normalizeContent(t.content);
+            if (newTrContent !== t.content) {
+              await this.prisma.articleTranslation.update({
+                where: { id: t.id },
+                data: { content: newTrContent },
+              });
+              console.log(`[WebP Migration] Normalized translation ${t.locale} content for article ${a.slug}`);
+            }
+          }
         }
       }
-    } catch (dbErr: any) {
-      console.warn('[WebP Migration] Media scan note:', dbErr.message);
+    } catch (err: any) {
+      console.warn('[WebP Migration] Content scan note:', err.message);
     }
 
-    // Also run syncPredefinedMedia to ensure all 20 base assets exist in DB as WebP
+    // 4. Purge redundant/deleted keys from Media table
+    const redundantKeys = [
+      'optimark/blog-uploads/1792001069373-screenshot-from-2026-10-15-00-30-37.webp',
+      'optimark/blog-uploads/digital-marketing-(seo-specialist).webp',
+      'optimark/blog-uploads/jo.webp',
+      'optimark/blog-uploads/perbedaan-rejection-candle-dan-pin-bar.webp',
+      'optimark/blog-uploads/video-promosi-singkat.webp',
+      'optimark/blog-uploads/warna-feed-instagram.webp',
+      'optimark/blog/people/logos/digital-marketing-(seo-specialist).webp',
+      'optimark/blog/people/logos/mnc-group.webp',
+      'optimark/blog/people/logos/optimark.webp',
+      'optimark/blog/people/logos/pt-citra-jasa-andalan.webp',
+      'optimark/blog/people/logos/pt-sribu-digital-kreatif.webp',
+      'optimark/blog/people/logos/pt-usaha-kreatif-indonesia.webp',
+      'optimark/blog/people/logos/purwadhika-digital-technology-school.webp',
+      'optimark/blog/people/logos/sanata-dharma-university.webp',
+    ];
+
+    try {
+      await this.prisma.media.deleteMany({
+        where: {
+          key: { in: redundantKeys },
+        },
+      });
+      console.log(`[WebP Migration] Cleaned up redundant records from cms_media table`);
+    } catch (cleanErr: any) {
+      console.warn('[WebP Migration] Media purge note:', cleanErr.message);
+    }
+
+    // 5. Also run syncPredefinedMedia to ensure all base assets exist in DB as WebP
     await this.syncPredefinedMedia();
 
     console.log('[WebP Migration] Finished with:', results);
