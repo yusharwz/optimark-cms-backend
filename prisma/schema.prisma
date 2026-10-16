@@ -1,0 +1,229 @@
+// Prisma Schema for Optimark SEO CMS Backend
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum ArticleStatus {
+  DRAFT
+  SCHEDULED
+  PUBLISHED
+  ARCHIVED
+}
+
+enum PersonType {
+  AUTHOR
+  REVIEWER
+  BOTH
+}
+
+enum CommentStatus {
+  PENDING
+  APPROVED
+  SPAM
+  REJECTED
+}
+
+enum UserRole {
+  ADMIN
+  EDITOR
+  AUTHOR
+}
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  passwordHash String    @map("password_hash")
+  name         String
+  role         UserRole  @default(EDITOR)
+  personId     String?   @unique @map("person_id")
+  person       Person?   @relation(fields: [personId], references: [id], onDelete: SetNull)
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  @@map("cms_users")
+}
+
+model Category {
+  id                String    @id @default(cuid())
+  name              String
+  nameId            String?   @map("name_id")
+  nameEn            String?   @map("name_en")
+  slug              String    @unique
+  slugId            String?   @map("slug_id")
+  slugEn            String?   @map("slug_en")
+  description       String?
+  descriptionId     String?   @map("description_id")
+  descriptionEn     String?   @map("description_en")
+  metaTitleId       String?   @map("meta_title_id")
+  metaTitleEn       String?   @map("meta_title_en")
+  metaDescriptionId String?   @map("meta_description_id")
+  metaDescriptionEn String?   @map("meta_description_en")
+  sortOrder         Int       @default(0) @map("sort_order")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+
+  articles    Article[]
+
+  @@map("cms_categories")
+}
+
+model Person {
+  id           String      @id @default(cuid())
+  name         String
+  slug         String      @unique
+  role         String      // e.g. "Content Strategist", "SEO Lead & Reviewer"
+  roleId       String?     @map("role_id")
+  roleEn       String?     @map("role_en")
+  positionId   String?     @map("position_id")
+  positionEn   String?     @map("position_en")
+  bio          String?
+  bioId        String?     @map("bio_id")
+  bioEn        String?     @map("bio_en")
+  expertiseId  String[]    @default([]) @map("expertise_id")
+  expertiseEn  String[]    @default([]) @map("expertise_en")
+  experienceId Json?       @map("experience_id")
+  experienceEn Json?       @map("experience_en")
+  educationId  Json?       @map("education_id")
+  educationEn  Json?       @map("education_en")
+  avatarUrl    String?     @map("avatar_url")
+  linkedinUrl  String?     @map("linkedin_url")
+  type         PersonType  @default(BOTH)
+  createdAt    DateTime    @default(now()) @map("created_at")
+  updatedAt    DateTime    @updatedAt @map("updated_at")
+
+  authoredArticles Article[] @relation("ArticleAuthor")
+  reviewedArticles Article[] @relation("ArticleReviewer")
+  user             User?
+
+  @@map("cms_people")
+}
+
+model Article {
+  id               String        @id @default(cuid())
+  title            String
+  slug             String        @unique
+  slugId           String?       @map("slug_id")
+  slugEn           String?       @map("slug_en")
+  excerpt          String?
+  content          String        @db.Text // Full body text (Markdown / rich text)
+  metaTitle        String?       @map("meta_title")
+  metaDescription  String?       @map("meta_description")
+  canonicalUrl     String?       @map("canonical_url")
+  coverImageUrl    String?       @map("cover_image_url")
+  coverImageAlt    String?       @map("cover_image_alt")
+  tags             String[]      @default([])
+  readMinutes      Int           @default(5) @map("read_minutes")
+  status           ArticleStatus @default(DRAFT)
+  featured         Boolean       @default(false)
+  tableOfContents  Json?         @map("table_of_contents") // Array of { id, level, text }
+  draftData        Json?         @map("draft_data") // Stored draft revision for published articles
+  previewToken     String        @unique @default(uuid()) @map("preview_token")
+
+  publishedAt      DateTime?     @map("published_at")
+  scheduledAt      DateTime?     @map("scheduled_at")
+  contentUpdatedAt DateTime?     @map("content_updated_at")
+  createdAt        DateTime      @default(now()) @map("created_at")
+  updatedAt        DateTime      @updatedAt @map("updated_at")
+
+  categoryId       String?       @map("category_id")
+  category         Category?     @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  authorId         String?       @map("author_id")
+  author           Person?       @relation("ArticleAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+
+  reviewerId       String?       @map("reviewer_id")
+  reviewer         Person?       @relation("ArticleReviewer", fields: [reviewerId], references: [id], onDelete: SetNull)
+
+  comments         Comment[]
+  translations     ArticleTranslation[]
+
+  @@index([status, publishedAt(sort: Desc)])
+  @@index([categoryId])
+  @@index([authorId])
+  @@index([reviewerId])
+  @@index([slugId])
+  @@index([slugEn])
+  @@map("cms_articles")
+}
+
+model ArticleTranslation {
+  id              String   @id @default(cuid())
+  articleId       String   @map("article_id")
+  locale          String   // "id" | "en"
+  title           String
+  slug            String?
+  excerpt         String?
+  content         String   @db.Text
+  metaTitle       String?  @map("meta_title")
+  metaDescription String?  @map("meta_description")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  article         Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  @@unique([articleId, locale])
+  @@index([locale])
+  @@index([slug])
+  @@map("cms_article_translations")
+}
+
+model Comment {
+  id            String        @id @default(cuid())
+  slug          String        // Target article slug
+  authorName    String        @map("author_name")
+  authorEmail   String        @map("author_email")
+  authorWebsite String?       @map("author_website")
+  avatarUrl     String?       @map("avatar_url")
+  content       String        @db.Text
+  status        CommentStatus @default(PENDING)
+  likes         Int           @default(0)
+
+  parentId      String?       @map("parent_id")
+  parent        Comment?      @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies       Comment[]     @relation("CommentReplies")
+
+  articleId     String?       @map("article_id")
+  article       Article?      @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt @map("updated_at")
+
+  @@index([slug, status])
+  @@index([status, createdAt(sort: Desc)])
+  @@index([articleId])
+  @@map("cms_comments")
+}
+
+model Redirect {
+  id          String   @id @default(cuid())
+  sourcePath  String   @unique @map("source_path")
+  targetPath  String   @map("target_path")
+  statusCode  Int      @default(301) @map("status_code")
+  active      Boolean  @default(true)
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@index([active, sourcePath])
+  @@map("cms_redirects")
+}
+
+model Media {
+  id        String   @id @default(cuid())
+  url       String   @unique
+  key       String   @unique
+  filename  String
+  altText   String?  @map("alt_text")
+  mimeType  String   @map("mime_type")
+  size      Int
+  width     Int?
+  height    Int?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("cms_media")
+}
