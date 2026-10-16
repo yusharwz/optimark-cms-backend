@@ -23,7 +23,7 @@ describe('MediaService', () => {
 
     expect(result.key).toBe('optimark/blog-uploads/my-test-image.webp');
     expect(result.filename).toBe('my-test-image.webp');
-    expect(result.fileUrl).toContain('optimark-staging-media.dritech.co.id');
+    expect(result.fileUrl).toContain('media.optimark.ai');
     expect(result.uploadUrl).toContain('X-Amz-Algorithm=AWS4-HMAC-SHA256');
     expect(result.altText).toBe('Custom Alt');
   });
