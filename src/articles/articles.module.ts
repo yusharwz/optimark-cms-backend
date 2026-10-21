@@ -6,9 +6,10 @@ import { ArticlesScheduler } from './articles.scheduler';
 import { RedirectsModule } from '../redirects/redirects.module';
 import { LandingSyncModule } from '../landing-sync/landing-sync.module';
 import { RevalidationModule } from '../revalidation/revalidation.module';
+import { MediaModule } from '../media/media.module';
 
 @Module({
-  imports: [RedirectsModule, LandingSyncModule, RevalidationModule],
+  imports: [RedirectsModule, LandingSyncModule, RevalidationModule, MediaModule],
   controllers: [ArticlesController],
   providers: [ArticlesService, ArticlesRepository, ArticlesScheduler],
   exports: [ArticlesService, ArticlesRepository],

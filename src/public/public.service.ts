@@ -181,7 +181,14 @@ export class PublicService {
         id: idSlug,
         en: enSlug,
       },
+      translations: (post.translations || []).map((t) => ({
+        locale: t.locale,
+        title: t.title,
+        slug: t.slug,
+        excerpt: t.excerpt,
+      })),
     };
+    delete (resolvedPost as any).draftData;
 
     // Fetch related posts from the same category
     const relatedPosts = await this.prisma.article.findMany({

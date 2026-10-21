@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe, Logger } from '@nestjs/common';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import compression from 'compression';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
@@ -8,6 +9,9 @@ async function bootstrap() {
     bodyParser: false,
   });
   const logger = new Logger('Bootstrap');
+
+  // Enable HTTP response compression (Gzip/Brotli)
+  app.use(compression());
 
   // Configure generous body parser limits (100mb) for rich-text articles & multilingual content
   app.useBodyParser('json', { limit: '100mb' });

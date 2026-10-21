@@ -1,8 +1,9 @@
-import { Injectable, NotFoundException, Logger } from '@nestjs/common';
+import { Injectable, NotFoundException, Logger, OnModuleInit } from '@nestjs/common';
 import { ArticlesRepository } from './articles.repository';
 import { RedirectsService } from '../redirects/redirects.service';
 import { LandingSyncService } from '../landing-sync/landing-sync.service';
 import { RevalidationService } from '../revalidation/revalidation.service';
+import { MediaService } from '../media/media.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateArticleDto } from './dto/create-article.dto';
 import { UpdateArticleDto } from './dto/update-article.dto';
@@ -12,7 +13,7 @@ import { ArticleStatus, Prisma } from '@prisma/client';
 import slugify from 'slugify';
 
 @Injectable()
-export class ArticlesService {
+export class ArticlesService implements OnModuleInit {
   private readonly logger = new Logger(ArticlesService.name);
 
   constructor(
@@ -20,6 +21,7 @@ export class ArticlesService {
     private readonly redirectsService: RedirectsService,
     private readonly landingSyncService: LandingSyncService,
     private readonly revalidationService: RevalidationService,
+    private readonly mediaService: MediaService,
     private readonly prisma: PrismaService,
   ) {}
 
@@ -95,6 +97,13 @@ export class ArticlesService {
 
   async create(dto: CreateArticleDto) {
     const slug = await this.generateUniqueSlug(dto.title, dto.slug);
+    dto.content = (await this.sanitizeBase64Images(dto.content, slug)) || dto.content;
+    if (dto.translations?.id?.content) {
+      dto.translations.id.content = (await this.sanitizeBase64Images(dto.translations.id.content, `${slug}-id`)) || dto.translations.id.content;
+    }
+    if (dto.translations?.en?.content) {
+      dto.translations.en.content = (await this.sanitizeBase64Images(dto.translations.en.content, `${slug}-en`)) || dto.translations.en.content;
+    }
     const toc = extractTableOfContents(dto.content);
     const readMinutes = dto.readMinutes || calculateReadMinutes(dto.content);
 
@@ -252,6 +261,16 @@ export class ArticlesService {
 
   async update(id: string, dto: UpdateArticleDto) {
     const current = await this.findById(id);
+
+    if (dto.content !== undefined) {
+      dto.content = (await this.sanitizeBase64Images(dto.content, current.slug)) || dto.content;
+    }
+    if (dto.translations?.id?.content) {
+      dto.translations.id.content = (await this.sanitizeBase64Images(dto.translations.id.content, `${current.slug}-id`)) || dto.translations.id.content;
+    }
+    if (dto.translations?.en?.content) {
+      dto.translations.en.content = (await this.sanitizeBase64Images(dto.translations.en.content, `${current.slug}-en`)) || dto.translations.en.content;
+    }
 
     if (dto.saveAsRevision && current.status === ArticleStatus.PUBLISHED) {
       const draftPayload = {
@@ -507,6 +526,114 @@ export class ArticlesService {
       }
     } catch (err: any) {
       this.logger.warn(`Failed to auto-sync media alt for ${urlOrFilename}: ${err.message}`);
+    }
+  }
+
+  async onModuleInit() {
+    // Background self-healing migration for any existing bloated base64 content
+    setTimeout(() => {
+      this.sanitizeBloatedArticles().catch((err: any) => {
+        this.logger.error(`Background article sanitization failed: ${err.message}`);
+      });
+    }, 3000);
+  }
+
+  async sanitizeBase64Images(rawContent?: string | null, slugHint = 'article'): Promise<string | undefined | null> {
+    if (!rawContent || !rawContent.includes('data:image/')) return rawContent;
+
+    const b64Regex = /data:image\/(png|jpeg|jpg|webp|gif|avif);base64,([A-Za-z0-9+/=]+)/g;
+    let match: RegExpExecArray | null;
+    let newContent = rawContent;
+    const matches: Array<{ fullMatch: string; ext: string; b64Data: string }> = [];
+
+    while ((match = b64Regex.exec(rawContent)) !== null) {
+      matches.push({
+        fullMatch: match[0],
+        ext: match[1] === 'jpeg' ? 'jpg' : match[1],
+        b64Data: match[2],
+      });
+    }
+
+    for (let i = 0; i < matches.length; i++) {
+      const item = matches[i];
+      try {
+        const buffer = Buffer.from(item.b64Data, 'base64');
+        const cleanSlug = slugify(slugHint, { lower: true, strict: true, trim: true }) || 'article';
+        const filename = `${cleanSlug}-img-${Date.now()}-${i + 1}.${item.ext}`;
+        const uploaded = await this.mediaService.uploadFile(
+          {
+            buffer,
+            mimetype: `image/${item.ext}`,
+            originalname: filename,
+            size: buffer.length,
+          },
+          `${slugHint} image ${i + 1}`,
+          true,
+        );
+        newContent = newContent.split(item.fullMatch).join(uploaded.url);
+      } catch (err: any) {
+        this.logger.error(`Failed to auto-upload base64 image: ${err.message}`);
+      }
+    }
+
+    return newContent;
+  }
+
+  private async sanitizeBloatedArticles() {
+    try {
+      const bloatedArticles = await this.prisma.article.findMany({
+        where: {
+          OR: [
+            { content: { contains: 'data:image/' } },
+            { translations: { some: { content: { contains: 'data:image/' } } } },
+          ],
+        },
+        include: {
+          translations: true,
+        },
+      });
+
+      if (bloatedArticles.length === 0) return;
+      this.logger.log(`Found ${bloatedArticles.length} bloated article(s) containing raw base64 images. Auto-migrating to R2 CDN...`);
+
+      for (const article of bloatedArticles) {
+        let contentChanged = false;
+        let newContent = article.content;
+
+        if (article.content && article.content.includes('data:image/')) {
+          newContent = (await this.sanitizeBase64Images(article.content, article.slug)) || article.content;
+          contentChanged = newContent !== article.content;
+        }
+
+        const updateData: Prisma.ArticleUpdateInput = {
+          draftData: Prisma.DbNull,
+        };
+
+        if (contentChanged) {
+          updateData.content = newContent;
+        }
+
+        await this.prisma.article.update({
+          where: { id: article.id },
+          data: updateData,
+        });
+
+        for (const tr of article.translations) {
+          if (tr.content && tr.content.includes('data:image/')) {
+            const newTrContent = (await this.sanitizeBase64Images(tr.content, `${article.slug}-${tr.locale}`)) || tr.content;
+            if (newTrContent !== tr.content) {
+              await this.prisma.articleTranslation.update({
+                where: { id: tr.id },
+                data: { content: newTrContent },
+              });
+            }
+          }
+        }
+
+        this.logger.log(`Successfully migrated base64 images to R2 CDN for article: ${article.slug}`);
+      }
+    } catch (err: any) {
+      this.logger.warn(`sanitizeBloatedArticles error: ${err.message}`);
     }
   }
 }
