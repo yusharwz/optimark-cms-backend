@@ -1,10 +1,17 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe, Logger } from '@nestjs/common';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+    bodyParser: false,
+  });
   const logger = new Logger('Bootstrap');
+
+  // Configure generous body parser limits (100mb) for rich-text articles & multilingual content
+  app.useBodyParser('json', { limit: '100mb' });
+  app.useBodyParser('urlencoded', { limit: '100mb', extended: true });
 
   // Enable CORS for CMS Frontend and Landing Page
   const corsOrigin = process.env.CORS_ORIGIN
