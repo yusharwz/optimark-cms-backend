@@ -12,6 +12,13 @@ import { extractTableOfContents, calculateReadMinutes } from '../common/utils/to
 import { ArticleStatus, Prisma } from '@prisma/client';
 import slugify from 'slugify';
 
+function cleanBareHeadings<T extends string | null | undefined>(text: T): T {
+  if (!text) return text;
+  let cleaned = text.replace(/^#{1,6}\s*(\r?\n)+/, '');
+  cleaned = cleaned.replace(/(\r?\n)#{1,6}\s*(\r?\n)/g, '$1$2');
+  return cleaned as T;
+}
+
 @Injectable()
 export class ArticlesService implements OnModuleInit {
   private readonly logger = new Logger(ArticlesService.name);
@@ -97,11 +104,14 @@ export class ArticlesService implements OnModuleInit {
 
   async create(dto: CreateArticleDto) {
     const slug = await this.generateUniqueSlug(dto.title, dto.slug);
+    dto.content = cleanBareHeadings(dto.content);
     dto.content = (await this.sanitizeBase64Images(dto.content, slug)) || dto.content;
     if (dto.translations?.id?.content) {
+      dto.translations.id.content = cleanBareHeadings(dto.translations.id.content);
       dto.translations.id.content = (await this.sanitizeBase64Images(dto.translations.id.content, `${slug}-id`)) || dto.translations.id.content;
     }
     if (dto.translations?.en?.content) {
+      dto.translations.en.content = cleanBareHeadings(dto.translations.en.content);
       dto.translations.en.content = (await this.sanitizeBase64Images(dto.translations.en.content, `${slug}-en`)) || dto.translations.en.content;
     }
     const toc = extractTableOfContents(dto.content);
@@ -263,12 +273,15 @@ export class ArticlesService implements OnModuleInit {
     const current = await this.findById(id);
 
     if (dto.content !== undefined) {
+      dto.content = cleanBareHeadings(dto.content);
       dto.content = (await this.sanitizeBase64Images(dto.content, current.slug)) || dto.content;
     }
     if (dto.translations?.id?.content) {
+      dto.translations.id.content = cleanBareHeadings(dto.translations.id.content);
       dto.translations.id.content = (await this.sanitizeBase64Images(dto.translations.id.content, `${current.slug}-id`)) || dto.translations.id.content;
     }
     if (dto.translations?.en?.content) {
+      dto.translations.en.content = cleanBareHeadings(dto.translations.en.content);
       dto.translations.en.content = (await this.sanitizeBase64Images(dto.translations.en.content, `${current.slug}-en`)) || dto.translations.en.content;
     }
 
@@ -581,28 +594,20 @@ export class ArticlesService implements OnModuleInit {
 
   private async sanitizeBloatedArticles() {
     try {
-      const bloatedArticles = await this.prisma.article.findMany({
-        where: {
-          OR: [
-            { content: { contains: 'data:image/' } },
-            { translations: { some: { content: { contains: 'data:image/' } } } },
-          ],
-        },
+      const allArticles = await this.prisma.article.findMany({
         include: {
           translations: true,
         },
       });
 
-      if (bloatedArticles.length === 0) return;
-      this.logger.log(`Found ${bloatedArticles.length} bloated article(s) containing raw base64 images. Auto-migrating to R2 CDN...`);
-
-      for (const article of bloatedArticles) {
+      for (const article of allArticles) {
         let contentChanged = false;
-        let newContent = article.content;
+        let newContent = cleanBareHeadings(article.content);
+        if (newContent !== article.content) contentChanged = true;
 
-        if (article.content && article.content.includes('data:image/')) {
-          newContent = (await this.sanitizeBase64Images(article.content, article.slug)) || article.content;
-          contentChanged = newContent !== article.content;
+        if (newContent && newContent.includes('data:image/')) {
+          newContent = (await this.sanitizeBase64Images(newContent, article.slug)) || newContent;
+          contentChanged = true;
         }
 
         const updateData: Prisma.ArticleUpdateInput = {
@@ -611,26 +616,29 @@ export class ArticlesService implements OnModuleInit {
 
         if (contentChanged) {
           updateData.content = newContent;
+          await this.prisma.article.update({
+            where: { id: article.id },
+            data: updateData,
+          });
         }
-
-        await this.prisma.article.update({
-          where: { id: article.id },
-          data: updateData,
-        });
 
         for (const tr of article.translations) {
-          if (tr.content && tr.content.includes('data:image/')) {
-            const newTrContent = (await this.sanitizeBase64Images(tr.content, `${article.slug}-${tr.locale}`)) || tr.content;
-            if (newTrContent !== tr.content) {
-              await this.prisma.articleTranslation.update({
-                where: { id: tr.id },
-                data: { content: newTrContent },
-              });
-            }
+          let trChanged = false;
+          let newTrContent = cleanBareHeadings(tr.content);
+          if (newTrContent !== tr.content) trChanged = true;
+
+          if (newTrContent && newTrContent.includes('data:image/')) {
+            newTrContent = (await this.sanitizeBase64Images(newTrContent, `${article.slug}-${tr.locale}`)) || newTrContent;
+            trChanged = true;
+          }
+
+          if (trChanged) {
+            await this.prisma.articleTranslation.update({
+              where: { id: tr.id },
+              data: { content: newTrContent },
+            });
           }
         }
-
-        this.logger.log(`Successfully migrated base64 images to R2 CDN for article: ${article.slug}`);
       }
     } catch (err: any) {
       this.logger.warn(`sanitizeBloatedArticles error: ${err.message}`);
