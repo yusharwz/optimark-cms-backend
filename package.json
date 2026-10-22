@@ -18,7 +18,13 @@
     "test:watch": "vitest",
     "test:cov": "vitest run --coverage",
     "test:debug": "vitest --inspect-brk --no-file-parallelism",
-    "test:e2e": "vitest run --config ./vitest.config.e2e.ts"
+    "test:e2e": "vitest run --config ./vitest.config.e2e.ts",
+    "secrets:pull": "infisical export --env=dev > .env",
+    "secrets:pull:staging": "infisical export --env=staging > .env",
+    "secrets:pull:prod": "infisical export --env=prod > .env",
+    "secrets:push:dev": "infisical secrets set --file=.env --env=dev",
+    "secrets:push:staging": "infisical secrets set --file=.env --env=staging",
+    "secrets:push:prod": "infisical secrets set --file=.env --env=prod"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1150.0",
